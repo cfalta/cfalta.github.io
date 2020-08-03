@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author"
+    content="map[name:Christoph Falta]">
+<meta name="description"
+    content="TL;DR; I recently added some improvements to PSArmoury, which I like to share with you in this post
+ Support for BlockDLL process mitigation to protect your armoury New config parameter that lets you choose the branch in github Simple way to create an armoury from a local file Automatic inventory function  Still reading? Great, let&amp;rsquo;s go.
+Introducing BlockDLL process mitigation Thanks to the great C# port of @_RastaMouse it was very easy to implement a process mitigation, that was actually meant to protect processes from malicious injections." />
+<meta name="keywords" content="it-security,information security,infosec,it,engineering,isec,blog,informatics,development,programming" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://cyberstoph.org/posts/2020/02/psarmoury-1.4-now-with-even-more-armour/" />
+
+
+<title>
+    
+    PSArmoury 1.4 - now with even more armour :: Cyberstoph&#39;s blog  — Cyberstoph&#39;s Blog
+    
+</title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="https://cyberstoph.org/main.min.50732f89be4725d13ca6bfcdb1222c13b176cb0f7f6f721eb384c09d5423300a.css">
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cyberstoph.org/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://cyberstoph.org/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://cyberstoph.org/favicon-16x16.png">
+<link rel="manifest" href="https://cyberstoph.org/site.webmanifest">
+<link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
+<link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
+<meta name="theme-color" content="#252627"><meta itemprop="name" content="PSArmoury 1.4 - now with even more armour">
+<meta itemprop="description" content="PSArmoury 1.4 - Process mitigations, branch selection and more">
+
+
+<meta itemprop="datePublished" content="2020-02-28T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-02-28T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="584">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cyberstoph.org/"/>
+
+<meta name="twitter:title" content="PSArmoury 1.4 - now with even more armour"/>
+<meta name="twitter:description" content="PSArmoury 1.4 - Process mitigations, branch selection and more"/>
+
+
+
+<meta property="article:section" content="ADSecurity" />
+<meta property="article:section" content="AD" />
+<meta property="article:section" content="PowerShell" />
+<meta property="article:section" content="Pentest" />
+<meta property="article:section" content="RedTeaming" />
+<meta property="article:section" content="Offense" />
+<meta property="article:section" content="AV" />
+<meta property="article:section" content="Evasion" />
+
+<meta property="article:published_time" content="2020-02-28 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+    </head>
+
+    <body class="dark-theme">
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://cyberstoph.org/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">PS #&gt; </span>
+            <span class="logo__cursor"></span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://cyberstoph.org/about/">About</a></li><li><a href="https://cyberstoph.org/posts/">Posts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+
+            <span class="theme-toggle unselectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+</svg>
+</span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="https://cyberstoph.org/posts/2020/02/psarmoury-1.4-now-with-even-more-armour/">PSArmoury 1.4 - now with even more armour</a></h2>
+
+            
+
+            <div class="post-content">
+                
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p>I recently added some improvements to <a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">PSArmoury</a>, which I like to share with you in this post</p>
+
+<ul>
+<li>Support for BlockDLL process mitigation to protect your armoury</li>
+<li>New config parameter that lets you choose the branch in github</li>
+<li>Simple way to create an armoury from a local file</li>
+<li>Automatic inventory function</li>
+</ul>
+
+<p>Still reading? Great, let&rsquo;s go.</p>
+
+<h2 id="introducing-blockdll-process-mitigation">Introducing BlockDLL process mitigation</h2>
+
+<p>Thanks to the great <a href="https://gist.github.com/rasta-mouse/af009f49229c856dc26e3a243db185ec" target="_blank">C# port of @_RastaMouse</a> it was very easy to implement a process mitigation, that was actually meant to protect processes from malicious injections. By setting a special <a href="https://docs.microsoft.com/en-gb/windows/win32/api/winnt/ns-winnt-process_mitigation_binary_signature_policy" target="_blank">flag</a> in the extended startupinfo of a new process, we can prevent any non-microsoft DLL from loading into that process. This can prevent certain EDR solutions from detecting well-known tools inside powershell.</p>
+
+<p>To use this with PSArmoury, just create your armoury with the <code>-EnhancedArmour</code> switch like shown below.</p>
+
+<p><img src="https://cyberstoph.org/img/4_blockdll_1.PNG" alt="blockdll1" /></p>
+
+<p>Note that this will change your user experience a bit. If you try to load an enhanced Armoury it will not decrypt it&rsquo;s content but start a new, protected powershell process and ask you to run it in there manually again. This might seem a bit cumbersome at first but the reasons are simple:</p>
+
+<ul>
+<li>We could also apply the process mitigation policy to the first powershell process we run in (just use Set-ProcessMitigation) but at that point, the process already started and any EDR/AV DLL already runs in that process. Therefore, we need to create a new, clean process.</li>
+<li>There are various ways to automatically run your armoury in the second powershell process, but then again this might raise a red flag itself so I went for the manual approach.</li>
+</ul>
+
+<p>So to use it, just run your armoury as usual and it will guide you through the rest of the process as shown below.</p>
+
+<p><img src="https://cyberstoph.org/img/4_blockdll_2.PNG" alt="blockdll1" /></p>
+
+<h2 id="choose-github-branch">Choose github branch</h2>
+
+<p>Every item of type &ldquo;GitHubRepo&rdquo; in your configuration file can now contain an attribute called &ldquo;Branch&rdquo;. If it exists, PSArmoury will try to use the branch name supplied in this attribute. If it does not exist, it will use the default branch as before. In the sample config you find on github, we use this attribute to download the dev branch of PowerSploit instead of the master.</p>
+
+<pre><code>    {
+        &quot;Name&quot;:  &quot;PowerSploit&quot;,
+        &quot;Type&quot;:  &quot;GitHubRepo&quot;,
+        &quot;URL&quot;:  &quot;https://api.github.com/repos/PowerShellMafia/PowerSploit&quot;,
+        &quot;Branch&quot;: &quot;dev&quot;,
+        &quot;FileInclusionFilter&quot;:	&quot;*.ps1&quot;,
+        &quot;FileExclusionFilter&quot;:	[&quot;*.tests.ps1&quot;]
+    }
+</code></pre>
+
+<h2 id="create-armoury-from-file">Create armoury from file</h2>
+
+<p>PSArmoury now offers a simple way to create an armoury from a local file. This comes in handy if you just want to quickly protect one (or many) powershell scripts you have on your disk without the need to create a config file.
+Just run PSArmoury with the <code>-FromFile</code> switch and pass it the path to a file or folder containing powershell scripts. You can omit the <code>-Config</code>-switch but note that only files with an extension of <code>*.ps1</code> will be included.</p>
+
+<p><img src="https://cyberstoph.org/img/4_fromfile.PNG" alt="fromfile" /></p>
+
+<h2 id="inventory">Inventory</h2>
+
+<p>I occassionally find myself in the situation where I don&rsquo;t remember what scripts I put inside an armoury, espescially when it&rsquo;s been some time since I created it. Since everything of relevance is encrypted in the file on disk, it is not so easy to get that information.
+Therefore every armoury now contains an inventory function called <code>Get-PSArmoury</code>, which will print the names of all files included to stdout. This function is built dynamically during creation of the armoury.</p>
+
+<p><img src="https://cyberstoph.org/img/4_inventory.PNG" alt="fromfile" /></p>
+
+<p>That&rsquo;s it for now. If you are using PSArmoury and experience any issues or have ideas for new features, I would be happy to hear from you. Just send me a mail or open an issue on github.</p>
+
+<p>Have a nice weekend!</p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+  			</div>
+
+        
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2020</span>
+            
+                <span><a href="https://cyberstoph.org/">Christoph Falta</a></span>
+            
+            <span>Copyright <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            <span> <a href="https://cyberstoph.org/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
+        </div>
+    </div>
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+
+<script type="text/javascript" src="https://cyberstoph.org/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
+
+
+
+    </body>
+</html>

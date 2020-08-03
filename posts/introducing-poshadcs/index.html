@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author"
+    content="map[name:Christoph Falta]">
+<meta name="description"
+    content="TL;DR;TL;DR; The script from this article leverages certificate templates to craft arbitrary smartcard logon certificates so you can impersonate any user. Use this to gain long-term stealthy persistence inside an Active Directory Domain or escalate your privileges to any user. Requirements: control over a user with write access on any kind of certificate template.
+TL;DR; Active Directory integrated Certificate Authorities (Enterprise CAs) store a part of their configuration in Active Directory." />
+<meta name="keywords" content="it-security,information security,infosec,it,engineering,isec,blog,informatics,development,programming" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="/posts/introducing-poshadcs/" />
+
+
+<title>
+    
+    Introducing PoshADCS ::  
+    
+</title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="/main.min.50732f89be4725d13ca6bfcdb1222c13b176cb0f7f6f721eb384c09d5423300a.css">
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#252627">
+<link rel="shortcut icon" href="/favicon.ico">
+<meta name="theme-color" content="#252627"><meta itemprop="name" content="Introducing PoshADCS">
+<meta itemprop="description" content="This post introduces a new Powershell script to facilitate attacks against Active Directory Certificate Services">
+
+
+<meta itemprop="datePublished" content="2019-11-09T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2019-11-09T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1383">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content=""/>
+
+<meta name="twitter:title" content="Introducing PoshADCS"/>
+<meta name="twitter:description" content="This post introduces a new Powershell script to facilitate attacks against Active Directory Certificate Services"/>
+
+
+
+<meta property="article:section" content="ADSecurity" />
+<meta property="article:section" content="AD" />
+<meta property="article:section" content="ADCS" />
+<meta property="article:section" content="CertificateServices" />
+<meta property="article:section" content="PKI" />
+<meta property="article:section" content="CA" />
+
+<meta property="article:published_time" content="2019-11-09 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+    </head>
+
+    <body class="dark-theme">
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">PS #&gt; </span>
+            <span class="logo__cursor"></span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="about/">About</a></li><li><a href="posts/">Posts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+
+            <span class="theme-toggle unselectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+</svg>
+</span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="/posts/introducing-poshadcs/">Introducing PoshADCS</a></h2>
+
+            
+
+            <div class="post-content">
+                
+
+<h2 id="tl-dr-tl-dr">TL;DR;TL;DR;</h2>
+
+<p>The script from this article leverages certificate templates to craft arbitrary smartcard logon certificates so you can impersonate any user. Use this to gain long-term stealthy persistence inside an Active Directory Domain or escalate your privileges to any user. Requirements: control over a user with write access on any kind of certificate template.</p>
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p>Active Directory integrated Certificate Authorities (Enterprise CAs) store a part of their configuration in Active Directory. Espescially of interest are the so called &ldquo;Certificate Templates&rdquo;.
+Certificate templates are used by clients als well as by the CA to determine how to populate the fields in a certificate request as well as the resulting certificate. Usually there are a couple of published certificate templates in any organization that uses an AD integrated CA.
+If an attacker gains write access (Write and Enroll or WriteDACL) on any of these templates (e.g. through a service account) it is possible to &ldquo;rewrite&rdquo; any template so the attacker can enroll a smart card certificate for arbitrary users (e.g. domain admin) and then impersonate that user.
+This can be used as an ACL-based backdoor as well as an offensive attack vector.</p>
+
+<h2 id="what-s-adcs">What&rsquo;s ADCS?</h2>
+
+<p>Active Directory Service Certificates is a server-role for Windows server that allows you to run a PKI (Public Key Infrastructure) on Windows. Upon installation, you can decide if you want to install a standalone or an enterprise CA. Simply put: a standalone CA is just a certificate authority running on Windows, whereas an enterprise CA integrates with Active Directory.
+You typically use the standalone CA for your root CA (because in can be offline or disconnected) and the enterprise CA for the issuing CA.
+So what does &ldquo;enterprise&rdquo; and &ldquo;integrated&rdquo; mean specifically?</p>
+
+<p>I tried to show the relevant interconnections in a picture. Though it looks like my little daughter drew it, I hope you get the point ;-)</p>
+
+<p><img src="/img/ADCS-for-a-three-year-old.png" alt="ADCS-intro" /></p>
+
+<p>An enterprise CA not only stores its configuration in a local database but also in the configuration partition of Active Directory under the following key:</p>
+
+<p><code>CN=Public Key Services, CN=Services, CN=Configuration, DC=domain, dc=com</code></p>
+
+<p>The data is split in different containers like &ldquo;AIA&rdquo; or &ldquo;Certificate Templates&rdquo;. We&rsquo;ll focus on those relevant to our attack scenario for now.</p>
+
+<p><img src="/img/publickey-container.PNG" alt="ADCS Container" /></p>
+
+<ul>
+<li><strong>Certificate Templates:</strong> stores the configuration for all certifcate templates. A certificate template basically is a blueprint for a certificate request (e.g. for an SMIME certificate). However not all certificate templates in this container are necessarily available for enrollment.</li>
+<li><strong>Enrollment Services:</strong> Stores CA&rsquo;s available for certificate enrollment. Windows hosts use this container to automatically find CA&rsquo;s that can issue certificates to them. The respective CA object in this container has a member attribute called &ldquo;certificate Templates&rdquo;. This attribute contains a list of all certificate templates (see above) that are available for enrollment on this CA. This is usually only a subset of all existing templates.</li>
+<li><strong>NtAuthCertificates:</strong> Stores CA&rsquo;s that are permitted to issue smartcard logon certificates. If you try to log on with a smartcard certificate issued by a CA not in this list, authentication will fail. Every Enterprise CA is automatically added here.</li>
+</ul>
+
+<h2 id="what-is-a-certificate-template">What is a certificate template?</h2>
+
+<p>As mentioned earlier, a certificate template is like a blueprint to populate a certificate request. Here&rsquo;s an example: a certificate template for a &ldquo;Computer Certificate&rdquo; (e.g. for authentication using 802.1x) contains certain attributes relevant to that usage scenario. This template will typically be configured to use the requesting hosts DNS name as the Common Name in the certificate.
+The computer requesting the certificate will therefore populate the certificate request in accordance with the settings in the template. The CA too uses the configuration in the template for validation, so even if the client submits a wrong common name, the CA would change it to the one defined in the template before issung the certificate.</p>
+
+<p><img src="/img/certificate-template.PNG" alt="CN configuration in a computer template" /></p>
+
+<p>As you can see in the screenshot above, it is however also possible to allow the enrollment client to submit an arbitrary common name. This poses a certain risk because the CA has to trust the client to provide a correct CN. The CA administrator can limit the acces to a certificate template through the ACL of the template object in Active Directory. The ACL of the template not only defines who can modify the template but also who can enroll a template.
+Certificate enrollment can either happen automatically (Permission = Auto Enrollment) or manually (Permission = Enroll). Auto enrollment is configured via group policy and enforced throuh the group policy client during processing of the policy. If auto enrollment is enabled, the group policy client will look for and enroll all available certificate templates where the auto enrollment permission is set.</p>
+
+<h2 id="attacking-certificate-templates">Attacking certificate templates</h2>
+
+<p>From a sysadmins perspective, certificate templates seem quite different. Every Enterprise CA ships with a couple of default templates and it is common practice that, if you want to use a certain template, you create a copy of one of the default templates and work with that.
+If you want to give a Windows client a certificate so it can participate in 802.1x, you would use a &ldquo;Computer&rdquo; template. If you want to issue SMIME certificates to your users, you&rsquo;ll use a copy of the &ldquo;User&rdquo; template.
+Every template is named after its intended cause and this strengthens the idea, that you can only issue computer certificates from a &ldquo;computer&rdquo;-template. However, there is no fundamental difference between two different templates. Every template can issue every kind of certficate, if populated with the right parameters.
+If an attacker gains access (Write/Enroll or WriteDACL) to any template, it is possible to reconfigure that template to issue certificates for Smartcard Logon. The attacker can even enroll these certificate for any given user, since the setting that defines the CN of the certificate is controlled in the template.</p>
+
+<p>Long story short, the attacker can impersonate any user by enrolling a smartcard logon certificate for that user. If the domain already uses smartcards for authentication, all requirements are already met and the attack should work out of the box.
+If smartcards are currently not in use in the target environment, the attack will still work as long as the following is true:</p>
+
+<ul>
+<li>The certificate of the Enterprise CA issuing the smartcard certificate needs to be present under &ldquo;CN=NtAuthCertificates, CN=Public Key Services, CN=Services, CN=Configuration, DC=domain, dc=com&rdquo;. This is done automatically during setup of the CA, so it shouldn&rsquo;t be a problem.</li>
+<li>You obviously need a smartcard. This can be a physical smartcard, however bringing a real smartcard implies the need of physical access, which can be a challenge. Luckily, there&rsquo;s a solution called &ldquo;virtual smartcard&rdquo;. More on that later.</li>
+<li>The domain controller(s) need&rsquo;s a certificate issued from one of the following templates: Domain Controller, Domain Controller Authentication, Kerberos Authentication. This is probably the only crucial requirement that might not be met. However if there is an enterprise CA and auto enrollment enabled, from my experience it is very likely that the domain controllers already got the certificate automatically.</li>
+</ul>
+
+<h2 id="virtual-smartcards-to-the-rescue">Virtual smartcards to the rescue</h2>
+
+<p>Since bringing a physical smartcard to a host you might have only remote access to can pose a challenge, there is a solution called virtual smartcard. Virtual smartcards where implemented in Windows 8 and allow you to use a TPM chip to create a virtual smartcard device.
+Since most modern business clients ship with a TPM chip, this shouldn&rsquo; be a problem. In fact, virtual smartcards are much more usable for the attack than real smartcards because they work out of the box on Windows clients and servers without the need of any special drivers and they work even over RDP.
+So you can use the virtual smartcard on a compromised client to log in to a server without TPM just as you would with username/password.
+Creating a virtual smartcard is simple as Windows provides a management tool called tpmvscmgr.exe Just run the command below to generate a smartcard with the default pin (12345678).</p>
+
+<p><code>tpmvscmgr.exe /create /name VSC01 /pin default /adminkey random /generate</code></p>
+
+<p><img src="/img/create-vsc.PNG" alt="Creating a virtual smartcard" /></p>
+
+<h2 id="proof-of-concept">Proof of concept</h2>
+
+<p>I wrote a proof of concept script that implements the attack described above. It takes the samaccountname of a domain user to impersonate and the name of a certificate template you have access to.
+The script will rewrite the template to allow for smartcard enrollment, get the certificate and then reset the template to its original configuration :-)</p>
+
+<p><img src="/img/poshadcs-poc.PNG" alt="POC" /></p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+  			</div>
+
+        
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2019</span>
+            
+                <span><a href="">Christoph Falta</a></span>
+            
+            <span>Copyright <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            <span> <a href="posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
+        </div>
+    </div>
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+
+<script type="text/javascript" src="/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
+
+
+
+    </body>
+</html>

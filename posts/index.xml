@@ -1,0 +1,390 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on Cyberstoph&#39;s blog</title>
+        <link>https://cyberstoph.org/posts/</link>
+        <description>Recent content in Posts on Cyberstoph&#39;s blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+        <lastBuildDate>Fri, 28 Feb 2020 00:00:00 +0000</lastBuildDate>
+        <atom:link href="https://cyberstoph.org/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>PSArmoury 1.4 - now with even more armour</title>
+            <link>https://cyberstoph.org/posts/2020/02/psarmoury-1.4-now-with-even-more-armour/</link>
+            <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2020/02/psarmoury-1.4-now-with-even-more-armour/</guid>
+            <description>TL;DR; I recently added some improvements to PSArmoury, which I like to share with you in this post
+ Support for BlockDLL process mitigation to protect your armoury New config parameter that lets you choose the branch in github Simple way to create an armoury from a local file Automatic inventory function  Still reading? Great, let&amp;rsquo;s go.
+Introducing BlockDLL process mitigation Thanks to the great C# port of @_RastaMouse it was very easy to implement a process mitigation, that was actually meant to protect processes from malicious injections.</description>
+            <content type="html"><![CDATA[
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p>I recently added some improvements to <a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">PSArmoury</a>, which I like to share with you in this post</p>
+
+<ul>
+<li>Support for BlockDLL process mitigation to protect your armoury</li>
+<li>New config parameter that lets you choose the branch in github</li>
+<li>Simple way to create an armoury from a local file</li>
+<li>Automatic inventory function</li>
+</ul>
+
+<p>Still reading? Great, let&rsquo;s go.</p>
+
+<h2 id="introducing-blockdll-process-mitigation">Introducing BlockDLL process mitigation</h2>
+
+<p>Thanks to the great <a href="https://gist.github.com/rasta-mouse/af009f49229c856dc26e3a243db185ec" target="_blank">C# port of @_RastaMouse</a> it was very easy to implement a process mitigation, that was actually meant to protect processes from malicious injections. By setting a special <a href="https://docs.microsoft.com/en-gb/windows/win32/api/winnt/ns-winnt-process_mitigation_binary_signature_policy" target="_blank">flag</a> in the extended startupinfo of a new process, we can prevent any non-microsoft DLL from loading into that process. This can prevent certain EDR solutions from detecting well-known tools inside powershell.</p>
+
+<p>To use this with PSArmoury, just create your armoury with the <code>-EnhancedArmour</code> switch like shown below.</p>
+
+<p><img src="/img/4_blockdll_1.PNG" alt="blockdll1" /></p>
+
+<p>Note that this will change your user experience a bit. If you try to load an enhanced Armoury it will not decrypt it&rsquo;s content but start a new, protected powershell process and ask you to run it in there manually again. This might seem a bit cumbersome at first but the reasons are simple:</p>
+
+<ul>
+<li>We could also apply the process mitigation policy to the first powershell process we run in (just use Set-ProcessMitigation) but at that point, the process already started and any EDR/AV DLL already runs in that process. Therefore, we need to create a new, clean process.</li>
+<li>There are various ways to automatically run your armoury in the second powershell process, but then again this might raise a red flag itself so I went for the manual approach.</li>
+</ul>
+
+<p>So to use it, just run your armoury as usual and it will guide you through the rest of the process as shown below.</p>
+
+<p><img src="/img/4_blockdll_2.PNG" alt="blockdll1" /></p>
+
+<h2 id="choose-github-branch">Choose github branch</h2>
+
+<p>Every item of type &ldquo;GitHubRepo&rdquo; in your configuration file can now contain an attribute called &ldquo;Branch&rdquo;. If it exists, PSArmoury will try to use the branch name supplied in this attribute. If it does not exist, it will use the default branch as before. In the sample config you find on github, we use this attribute to download the dev branch of PowerSploit instead of the master.</p>
+
+<pre><code>    {
+        &quot;Name&quot;:  &quot;PowerSploit&quot;,
+        &quot;Type&quot;:  &quot;GitHubRepo&quot;,
+        &quot;URL&quot;:  &quot;https://api.github.com/repos/PowerShellMafia/PowerSploit&quot;,
+        &quot;Branch&quot;: &quot;dev&quot;,
+        &quot;FileInclusionFilter&quot;:	&quot;*.ps1&quot;,
+        &quot;FileExclusionFilter&quot;:	[&quot;*.tests.ps1&quot;]
+    }
+</code></pre>
+
+<h2 id="create-armoury-from-file">Create armoury from file</h2>
+
+<p>PSArmoury now offers a simple way to create an armoury from a local file. This comes in handy if you just want to quickly protect one (or many) powershell scripts you have on your disk without the need to create a config file.
+Just run PSArmoury with the <code>-FromFile</code> switch and pass it the path to a file or folder containing powershell scripts. You can omit the <code>-Config</code>-switch but note that only files with an extension of <code>*.ps1</code> will be included.</p>
+
+<p><img src="/img/4_fromfile.PNG" alt="fromfile" /></p>
+
+<h2 id="inventory">Inventory</h2>
+
+<p>I occassionally find myself in the situation where I don&rsquo;t remember what scripts I put inside an armoury, espescially when it&rsquo;s been some time since I created it. Since everything of relevance is encrypted in the file on disk, it is not so easy to get that information.
+Therefore every armoury now contains an inventory function called <code>Get-PSArmoury</code>, which will print the names of all files included to stdout. This function is built dynamically during creation of the armoury.</p>
+
+<p><img src="/img/4_inventory.PNG" alt="fromfile" /></p>
+
+<p>That&rsquo;s it for now. If you are using PSArmoury and experience any issues or have ideas for new features, I would be happy to hear from you. Just send me a mail or open an issue on github.</p>
+
+<p>Have a nice weekend!</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>An introduction to Golden Certificates</title>
+            <link>https://cyberstoph.org/posts/2019/12/an-introduction-to-golden-certificates/</link>
+            <pubDate>Sat, 07 Dec 2019 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2019/12/an-introduction-to-golden-certificates/</guid>
+            <description>TL;DR I wrote in one of my previous posts about how control over a certificate template of any kind can be abused to get a Smartcard certificate for a domain admin. In this post, I want to write a little bit more about the persistence capabilities this approach has to offer, as well as how you can detect it. I call this approach a &amp;ldquo;golden certificate&amp;rdquo; as a tribute to Benjamin Delpys famous &amp;ldquo;golden ticket&amp;rdquo;.</description>
+            <content type="html"><![CDATA[
+
+<h2 id="tl-dr">TL;DR</h2>
+
+<p>I wrote in <a href="https://cyberstoph.org/posts/2019/11/introducing-poshadcs/" target="_blank">one of my previous posts</a> about how control over a certificate template of any kind can be abused to get a Smartcard certificate for a domain admin. In this post, I want to write a little bit more about the persistence capabilities this approach has to offer, as well as how you can detect it.
+I call this approach a &ldquo;golden certificate&rdquo; as a tribute to Benjamin Delpys famous &ldquo;golden ticket&rdquo;. The lifetime will not be as long as the one of a golden ticket since certificate lifetime is subject to some boundaries as described below, However it will usually be at least a year - so pretty much time for the attacker anyway.</p>
+
+<p><img src="/img/3_willywonkacertmeme.jpg" alt="wonka" /></p>
+
+<p>Credits go to the folks at <a href="https://www.sysadmins.lv/blog-en/" target="_blank">sysadmins.lv</a>, which is an excellent source on PKI related stuff and (as always) Will Schroeder for gifting us with <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1" target="_blank">PowerView</a>.</p>
+
+<h2 id="recap">Recap</h2>
+
+<p>Certificate templates are objects in Active Directory that are used as a form of decentralized configuration by Active Directory integrated Certificate Authorities (Active Directory Certificate Services - ADCS). Certificate templates are normally used for a certain purpose (e.g. computer certificates, S/MIME certificates,&hellip;) but that&rsquo;s just how it looks for the Administrator. They are all the same kind of object and if you have write access on the object itself, you can just reconfigure a computer template or any other template to be a smartcard template that accepts arbitrary user names :-). How do we get there?</p>
+
+<h2 id="finding-vulnerable-templates">Finding vulnerable templates</h2>
+
+<p>You can find target accounts with PoshADCS. Just download it from <a href="https://github.com/cfalta/PoshADCS" target="_blank">Github</a> and also don&rsquo;t forget <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1" target="_blank">PowerView</a>, since we rely on that. First import both into your current PowerShell session.</p>
+
+<pre><code>cat -raw PowerView.ps1 | iex
+cat -raw ADCS.ps1 | iex
+</code></pre>
+
+<p>Then run Get-ADCSTemplateACL to query the ACLs of all certificate templates in the current domain. You can use one of the predefined filters to reduce the results since all templates have a couple of default ACEs that allow access for default groups (e.g. Domain Admins).</p>
+
+<ul>
+<li><strong>-Filter AdminACEs</strong> will remove the ACEs of default administrative groups from the output.</li>
+<li><strong>-Filter DefaultACEs</strong> will remove administrative ACEs like above, but will also hide other default groups (e.g. Domain Computers on a computer template).</li>
+</ul>
+
+<p>This is useful if you are looking for permissions that have been set explicitly in your environment and grant access to custom users or groups.</p>
+
+<pre><code>Get-ADCSTemplateACL -Filter DefaultACEs
+</code></pre>
+
+<p>In our example below, we see that the user &ldquo;John&rdquo; has been granted explicit write permissions on the computer template.</p>
+
+<p><img src="/img/3_templatewritepermissions.PNG" alt="TemplatePermissions" /></p>
+
+<p>If we can get hold of this users credentials, we can use these to get a smartcard certificate for a domain admin or basically any other user you would like to impersonate. The <code>Get-SmartCardCertificate</code> function inside PoshADCS allows us to do just that. But more on that later.</p>
+
+<h2 id="lifetime-of-a-golden-certificate">Lifetime of a Golden Certificate</h2>
+
+<p>The maximum certificate lifetime will be the shortest of the following:</p>
+
+<ul>
+<li><p>the validity time configured in the certificate template.</p></li>
+
+<li><p>the remaining validity period of the signing CA certificate. Simply put, a certificate issued by a CA cannot be valid longer than the CA certificate itself.</p></li>
+
+<li><p>the timerange defined in the CA configuration file (CAPolicy.inf) during installation. If not defined, this is the default value of 2 years, which means that if the CA is deployed with all default values, the Golden Certificate can usually not last longer than 2 years maximum. You can check the CA configuration using certutil on the CA server.</p>
+
+<pre><code>certutil -getreg CA\ValidityPeriod
+certutil -getreg CA\ValidityPeriodUnits
+</code></pre></li>
+</ul>
+
+<h2 id="getting-a-golden-certificate">Getting a Golden Certificate</h2>
+
+<pre><code>man Get-SmartcardCertificate
+</code></pre>
+
+<p><img src="/img/3_manGetSmartcardCertificate.JPG" alt="Parameters" /></p>
+
+<ul>
+<li><strong>Identity</strong> is the samAccountName of the target user</li>
+<li><strong>TemplateName</strong> is the CN of the template we will abuse (= the one you have write permissions on)</li>
+<li><strong>NoSmartCard</strong> instructs the script not to use the Smartcard CSP and make the certificate exportable. The resulting certificate will be stored in the normal user certificate store. This is useful if you have no ability to get a Smartcard on the host you request the certificate on. Just export it from the store and import it back on a smartcard on a host you control. It&rsquo;s also useful if you just want to prove that the attack would succeed without messing around with Smartcards.</li>
+</ul>
+
+<p>We will run Get-SmartcardCertificate mit the <code>NoSmartCard</code> switch to get an exportable certificate for the user &ldquo;Chuck Norris&rdquo; (who obviously is a domain admin).</p>
+
+<pre><code>Get-SmartcardCertificate -Identity norris -Template CorpComputer -NoSmartcard
+</code></pre>
+
+<p><img src="/img/3_getcertfordomadm.PNG" alt="POC" /></p>
+
+<h2 id="defending-against-golden-certificates">Defending against Golden Certificates</h2>
+
+<p>Like Golden Tickets, you can&rsquo;t really prevent these things once an attacker has the appropriate permissions to do so. But you can detect and respond as soon as it happens.</p>
+
+<ul>
+<li>First, be aware that your CA Admins (or any other user who can change a certificate template) are equivilant to Domain Admins. Therefore monitor and protect these accounts as you do with your Domain Admins.</li>
+<li>Second, you should monitor issued certificates and changes to certificate templates closely.</li>
+</ul>
+
+<p>I will sum up quickly how to configure auditing on the CA but you should definitely have a look at Microsofts <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn786432(v%3Dws.11)" target="_blank">PKI Monitoring Guide</a> for more details.</p>
+
+<p>We start with enabling success/failure logging for &ldquo;Object Access\Audit Certificate Services&rdquo;. You can do this with group policy (Configuration\Windows Settings\Security Settings\Advanced Audit Policy) or locally by running</p>
+
+<pre><code>auditpol /set /subcategory:&quot;Certification Services&quot; /success:enable /failure:enable
+</code></pre>
+
+<p>After that you need to enable auditing in the &ldquo;Auditing&rdquo; tab of your CA. I would recommend to enable all categories but you need at least &ldquo;Change CA configuration&rdquo; and &ldquo;Issue and manage certificate requests&rdquo; to detect this attack.</p>
+
+<p><img src="/img/3_ca_auditing_properties.png" alt="CA Audit config" /></p>
+
+<p>In addition, you have to run the following certutil command to activate logging of template changes.</p>
+
+<pre><code>certutil –setreg policy\EditFlags +EDITF_AUDITCERTTEMPLATELOAD
+</code></pre>
+
+<p>Now that everything is set, you should find events of the task category <code>Certification Services</code> trickling into the default Security log of your CA. Rebooting the CA server once might speed this process up if you are missing events.</p>
+
+<p>The event most interesting for us is <code>A Certificate Services template was updated (4899)</code>. 4899 will be logged when a certificate template changes and contains the old as well as the new configuration. You can use this to match template updates where the new configuration contains a <code>pKIExtendedKeyUsage</code> attribute that matches the string <code>1.3.6.1.4.1.311.20.2.2 Smart Card Logon</code>.</p>
+
+<p><img src="/img/3_event4899_1.PNG" alt="4899" /></p>
+
+<p>We will also find a <code>Certificate Services approved a certificate request and issued a certificate (4887)</code> for our Golden Certificate, however this event unfortunately does not hold much information for us. You can see in the screenshot below that we do not find the identity to whom the certificate was issued in the event nor the certificate template it refers to :-( :-( :-(. Therefore we cant use this event to alert on but it is still useful from a forensics perspective.</p>
+
+<p><img src="/img/3_event4887_1.PNG" alt="4887" /></p>
+
+<p>That&rsquo;s it for now. Give it a try and let me know what you think!</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Evading anti-virus with Powershell Armoury</title>
+            <link>https://cyberstoph.org/posts/2019/12/evading-anti-virus-with-powershell-armoury/</link>
+            <pubDate>Mon, 02 Dec 2019 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2019/12/evading-anti-virus-with-powershell-armoury/</guid>
+            <description>TL;DR; PSArmoury is a PowerShell script that allows you to easily get the newest versions of all your favourite offensive PowerShell craft and automatically put it together in a single, encrypted .ps1-file. Think of it like a &amp;ldquo;yum update&amp;rdquo; that pipes the result in an encrypted container to take it with you. AMSI and EDR bypass included :-)
+PSArmoury I wrote my &amp;ldquo;Powershell Armoury&amp;rdquo; script a while ago to tackle two issues I often encountered during engagements:</description>
+            <content type="html"><![CDATA[
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p><a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">PSArmoury</a> is a PowerShell script that allows you to easily get the newest versions of all your favourite offensive PowerShell craft and automatically put it together in a single, encrypted .ps1-file. Think of it like a &ldquo;yum update&rdquo; that pipes the result in an encrypted container to take it with you. AMSI and EDR bypass included :-)</p>
+
+<h2 id="psarmoury">PSArmoury</h2>
+
+<p>I wrote my &ldquo;Powershell Armoury&rdquo; script a while ago to tackle two issues I often encountered during engagements:</p>
+
+<ul>
+<li>First, I&rsquo;m a huge fan of PowerShell and if possible, I do everything in PowerShell. So after some time I got a pretty big list of already existing tools and self-made scripts that I want to take with me when doing a Windows or Active Directory assessment. However all these different scripts (even my own ;-)) get updated frequently and I usually ended up with some out-dated software in the field.</li>
+<li>Second, most of the existing well-known PowerShell tools like PowerView or Inveigh will be detected instantly by any anti-virus solution - at least on disk.</li>
+</ul>
+
+<p><img src="/img/braveheart.png" alt="braveheart" /></p>
+
+<p>So I created PSArmoury, which allows me to do the following:</p>
+
+<ul>
+<li>Create a simple json config file containing links to all my favourite tools on the internet. You only have to do this once.</li>
+<li>Then, everytime before an engagement you just run New-PSArmoury and it will automatically fetch the newest version of all those PowerShell scripts and put them together in a single, encrypted ps1-file. This is your Armoury.</li>
+</ul>
+
+<p>Let&rsquo;s have a look at that. You can find PSArmoury on <a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">Github</a>. Just download or clone and you&rsquo;re ready to go.
+First, let&rsquo;s have a look at the config. PSArmoury comes with a sample configuration file called PSArmoury.json that already references some well-known tools like PowerSploit or Inveigh. You can use this for inspiration. The configuration file is just a JSON array containing the different script files you want to include. An array member looks like this.</p>
+
+<p><img src="/img/psarmoury1.PNG" alt="psarmoury1" /></p>
+
+<p>Every config item consists of a name, an URL, a type and optional inclusion/exclusion filter. The major difference here is the type and there are three differen types available.</p>
+
+<ul>
+<li><strong>GitHubRepo</strong>: this instructs PSArmoury to automatically include all files in the Github Repo (that matches the Inclusion/Exclusion filter). It will ask for a Github username and personal access token since we use the Github API here.</li>
+<li><strong>GitHubItem</strong>: this instructs PSArmoury to download a single file from Github. It will ask for a Github username and personal access token since we use the Github API here.</li>
+<li><strong>WebDownloadSimple</strong>: this instructs PSArmoury to download a single file from an arbitrary webserver. No credentials needed.</li>
+</ul>
+
+<p>So in the example above, the configuration instructs PSArmoury to download all files from Kevin Robertsons repostory &ldquo;Invoke-TheHash&rdquo; that match the inclusion filter &ldquo;*.ps1&rdquo;.</p>
+
+<p>Once you have created your configuration, you can simply run</p>
+
+<pre><code>. .\New-PSArmoury.ps1
+New-PSArmoury -Path .\MyShinyNewArmoury.ps1 -Config .\PSArmoury.json
+</code></pre>
+
+<p>Note that it will require you to enter credentials to use the GitHub API. You have to enter your username and a personal access token.</p>
+
+<p>Here&rsquo;s a screenshot using the sample config that comes with PSArmoury.</p>
+
+<p><img src="/img/psarmoury2.PNG" alt="psarmoury1" /></p>
+
+<p>The output above mentions a password. This has been generated randomly and is included <strong>in cleartext</strong> in the resulting armoury file. This is not a problem since we use encryption only as a means of obfuscation here and not for confidentiality. Still, if you want to remove the password from your armoury you can use the <code>-OmitPassword</code> switch to do so. If you want to use a custom password or salt you can do this too by using the <code>-Password</code> and <code>-Salt</code> parameters.</p>
+
+<p>Now, how do you use your new and shiny armoury? It&rsquo;s actually very simple, just open powershell on the host of your choice and load the .ps1 file like this.</p>
+
+<pre><code>cat -raw .\MyShinyNewArmoury.ps1 | iex
+</code></pre>
+
+<p>And that&rsquo;s it. This will disable AMSI, load all encrypted blobs into powershell and then decrypt and load them in memory. Happy Hacking :-)</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Introducing PoshADCS</title>
+            <link>https://cyberstoph.org/posts/2019/11/introducing-poshadcs/</link>
+            <pubDate>Sat, 09 Nov 2019 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2019/11/introducing-poshadcs/</guid>
+            <description>TL;DR;TL;DR; The script from this article leverages certificate templates to craft arbitrary smartcard logon certificates so you can impersonate any user. Use this to gain long-term stealthy persistence inside an Active Directory Domain or escalate your privileges to any user. Requirements: control over a user with write access on any kind of certificate template. The heavy lifting in the script is done with PowerView by Will Schroeder, so the kudos go to him.</description>
+            <content type="html"><![CDATA[
+
+<h2 id="tl-dr-tl-dr">TL;DR;TL;DR;</h2>
+
+<p>The script from this article leverages certificate templates to craft arbitrary smartcard logon certificates so you can impersonate any user. Use this to gain long-term stealthy persistence inside an Active Directory Domain or escalate your privileges to any user. Requirements: control over a user with write access on any kind of certificate template.
+The heavy lifting in the script is done with <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1" target="_blank">PowerView</a> by Will Schroeder, so the kudos go to him.</p>
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p>Active Directory integrated Certificate Authorities (Enterprise CAs) store a part of their configuration in Active Directory. Espescially of interest are the so called &ldquo;Certificate Templates&rdquo;.
+Certificate templates are used by clients als well as by the CA to determine how to populate the fields in a certificate request as well as the resulting certificate. Usually there are a couple of published certificate templates in any organization that uses an AD integrated CA.
+If an attacker gains write access (Write and Enroll or WriteDACL) on any of these templates (e.g. through a service account) it is possible to &ldquo;rewrite&rdquo; any template so the attacker can enroll a smart card certificate for arbitrary users (e.g. domain admin) and then impersonate that user.
+This can be used as an ACL-based backdoor as well as an offensive attack vector.</p>
+
+<h2 id="what-s-adcs">What&rsquo;s ADCS?</h2>
+
+<p>Active Directory Service Certificates is a server-role for Windows server that allows you to run a PKI (Public Key Infrastructure) on Windows. Upon installation, you can decide if you want to install a standalone or an enterprise CA. Simply put: a standalone CA is just a certificate authority running on Windows, whereas an enterprise CA integrates with Active Directory.
+You typically use the standalone CA for your root CA (because in can be offline or disconnected) and the enterprise CA for the issuing CA.
+So what does &ldquo;enterprise&rdquo; and &ldquo;integrated&rdquo; mean specifically?</p>
+
+<p>I tried to show the relevant interconnections in a picture. Though it looks like my little daughter drew it, I hope you get the point ;-)</p>
+
+<p><img src="/img/ADCS-for-a-three-year-old.png" alt="ADCS-intro" /></p>
+
+<p>An enterprise CA not only stores its configuration in a local database but also in the configuration partition of Active Directory under the following key:</p>
+
+<p><code>CN=Public Key Services, CN=Services, CN=Configuration, DC=domain, dc=com</code></p>
+
+<p>The data is split in different containers like &ldquo;AIA&rdquo; or &ldquo;Certificate Templates&rdquo;. We&rsquo;ll focus on those relevant to our attack scenario for now.</p>
+
+<p><img src="/img/publickey-container.PNG" alt="ADCS Container" /></p>
+
+<ul>
+<li><strong>Certificate Templates:</strong> stores the configuration for all certifcate templates. A certificate template basically is a blueprint for a certificate request (e.g. for an SMIME certificate). However not all certificate templates in this container are necessarily available for enrollment.</li>
+<li><strong>Enrollment Services:</strong> Stores CA&rsquo;s available for certificate enrollment. Windows hosts use this container to automatically find CA&rsquo;s that can issue certificates to them. The respective CA object in this container has a member attribute called &ldquo;certificate Templates&rdquo;. This attribute contains a list of all certificate templates (see above) that are available for enrollment on this CA. This is usually only a subset of all existing templates.</li>
+<li><strong>NtAuthCertificates:</strong> Stores CA&rsquo;s that are permitted to issue smartcard logon certificates. If you try to log on with a smartcard certificate issued by a CA not in this list, authentication will fail. Every Enterprise CA is automatically added here.</li>
+</ul>
+
+<h2 id="what-is-a-certificate-template">What is a certificate template?</h2>
+
+<p>As mentioned earlier, a certificate template is like a blueprint to populate a certificate request. Here&rsquo;s an example: a certificate template for a &ldquo;Computer Certificate&rdquo; (e.g. for authentication using 802.1x) contains certain attributes relevant to that usage scenario. This template will typically be configured to use the requesting hosts DNS name as the Common Name in the certificate.
+The computer requesting the certificate will therefore populate the certificate request in accordance with the settings in the template. The CA too uses the configuration in the template for validation, so even if the client submits a wrong common name, the CA would change it to the one defined in the template before issung the certificate.</p>
+
+<p><img src="/img/certificate-template.PNG" alt="CN configuration in a computer template" /></p>
+
+<p>As you can see in the screenshot above, it is however also possible to allow the enrollment client to submit an arbitrary common name. This poses a certain risk because the CA has to trust the client to provide a correct CN. The CA administrator can limit the acces to a certificate template through the ACL of the template object in Active Directory. The ACL of the template not only defines who can modify the template but also who can enroll a template.
+Certificate enrollment can either happen automatically (Permission = Auto Enrollment) or manually (Permission = Enroll). Auto enrollment is configured via group policy and enforced throuh the group policy client during processing of the policy. If auto enrollment is enabled, the group policy client will look for and enroll all available certificate templates where the auto enrollment permission is set.</p>
+
+<h2 id="attacking-certificate-templates">Attacking certificate templates</h2>
+
+<p>From a sysadmins perspective, certificate templates seem quite different. Every Enterprise CA ships with a couple of default templates and it is common practice that, if you want to use a certain template, you create a copy of one of the default templates and work with that.
+If you want to give a Windows client a certificate so it can participate in 802.1x, you would use a &ldquo;Computer&rdquo; template. If you want to issue SMIME certificates to your users, you&rsquo;ll use a copy of the &ldquo;User&rdquo; template.
+Every template is named after its intended cause and this strengthens the idea, that you can only issue computer certificates from a &ldquo;computer&rdquo;-template. However, there is no fundamental difference between two different templates. Every template can issue every kind of certficate, if populated with the right parameters.
+If an attacker gains access (Write/Enroll or WriteDACL) to any template, it is possible to reconfigure that template to issue certificates for Smartcard Logon. The attacker can even enroll these certificate for any given user, since the setting that defines the CN of the certificate is controlled in the template.</p>
+
+<p>Long story short, the attacker can impersonate any user by enrolling a smartcard logon certificate for that user. If the domain already uses smartcards for authentication, all requirements are already met and the attack should work out of the box.
+If smartcards are currently not in use in the target environment, the attack will still work as long as the following is true:</p>
+
+<ul>
+<li>The certificate of the Enterprise CA issuing the smartcard certificate needs to be present under &ldquo;CN=NtAuthCertificates, CN=Public Key Services, CN=Services, CN=Configuration, DC=domain, dc=com&rdquo;. This is done automatically during setup of the CA, so it shouldn&rsquo;t be a problem.</li>
+<li>You obviously need a smartcard. This can be a physical smartcard, however bringing a real smartcard implies the need of physical access, which can be a challenge. Luckily, there&rsquo;s a solution called &ldquo;virtual smartcard&rdquo;. More on that later.</li>
+<li>The domain controller(s) need&rsquo;s a certificate issued from one of the following templates: Domain Controller, Domain Controller Authentication, Kerberos Authentication. This is probably the only crucial requirement that might not be met. However if there is an enterprise CA and auto enrollment enabled, from my experience it is very likely that the domain controllers already got the certificate automatically.</li>
+</ul>
+
+<h2 id="virtual-smartcards-to-the-rescue">Virtual smartcards to the rescue</h2>
+
+<p>Since bringing a physical smartcard to a host you might have only remote access to can pose a challenge, there is a solution called virtual smartcard. Virtual smartcards where implemented in Windows 8 and allow you to use a TPM chip to create a virtual smartcard device.
+Since most modern business clients ship with a TPM chip, this shouldn&rsquo; be a problem. In fact, virtual smartcards are much more usable for the attack than real smartcards because they work out of the box on Windows clients and servers without the need of any special drivers and they work even over RDP.
+So you can use the virtual smartcard on a compromised client to log in to a server without TPM just as you would with username/password.
+Creating a virtual smartcard is simple as Windows provides a management tool called tpmvscmgr.exe Just run the command below to generate a smartcard with the default pin (12345678).</p>
+
+<p><code>tpmvscmgr.exe /create /name VSC01 /pin default /adminkey random /generate</code></p>
+
+<p><img src="/img/create-vsc.PNG" alt="Creating a virtual smartcard" /></p>
+
+<h2 id="proof-of-concept">Proof of concept</h2>
+
+<p>I wrote a proof of concept script that implements the attack described above. It takes the samaccountname of a domain user to impersonate and the name of a certificate template you have access to.
+The script will rewrite the template to allow for smartcard enrollment, get the certificate and then reset the template to its original configuration :-)</p>
+
+<p><img src="/img/poshadcs-poc.PNG" alt="POC" /></p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Hello World</title>
+            <link>https://cyberstoph.org/posts/2019/10/hello-world/</link>
+            <pubDate>Mon, 21 Oct 2019 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2019/10/hello-world/</guid>
+            <description>Hello World! Yet another blog unravels in the depths of the internet. Let&amp;rsquo;s see if anyone will find it at all :-)
+If you however do so, you&amp;rsquo;ll probably read a lot about Windows security, Powershell, AD, privesc and general infosec stuff.
+Hope you like it stranger!</description>
+            <content type="html"><![CDATA[<p>Hello World! Yet another blog unravels in the depths of the internet. Let&rsquo;s see if anyone will find it at all :-)</p>
+
+<p>If you however do so, you&rsquo;ll probably read a lot about Windows security, Powershell, AD, privesc and general infosec stuff.</p>
+
+<p>Hope you like it stranger!</p>
+]]></content>
+        </item>
+        
+    </channel>
+</rss>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Offense on Cyberstoph&#39;s blog</title>
+    <link>https://cyberstoph.org/categories/offense/</link>
+    <description>Recent content in Offense on Cyberstoph&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Fri, 28 Feb 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://cyberstoph.org/categories/offense/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>PSArmoury 1.4 - now with even more armour</title>
+      <link>https://cyberstoph.org/posts/2020/02/psarmoury-1.4-now-with-even-more-armour/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/posts/2020/02/psarmoury-1.4-now-with-even-more-armour/</guid>
+      <description>TL;DR; I recently added some improvements to PSArmoury, which I like to share with you in this post
+ Support for BlockDLL process mitigation to protect your armoury New config parameter that lets you choose the branch in github Simple way to create an armoury from a local file Automatic inventory function  Still reading? Great, let&amp;rsquo;s go.
+Introducing BlockDLL process mitigation Thanks to the great C# port of @_RastaMouse it was very easy to implement a process mitigation, that was actually meant to protect processes from malicious injections.</description>
+    </item>
+    
+    <item>
+      <title>Evading anti-virus with Powershell Armoury</title>
+      <link>https://cyberstoph.org/posts/2019/12/evading-anti-virus-with-powershell-armoury/</link>
+      <pubDate>Mon, 02 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/posts/2019/12/evading-anti-virus-with-powershell-armoury/</guid>
+      <description>TL;DR; PSArmoury is a PowerShell script that allows you to easily get the newest versions of all your favourite offensive PowerShell craft and automatically put it together in a single, encrypted .ps1-file. Think of it like a &amp;ldquo;yum update&amp;rdquo; that pipes the result in an encrypted container to take it with you. AMSI and EDR bypass included :-)
+PSArmoury I wrote my &amp;ldquo;Powershell Armoury&amp;rdquo; script a while ago to tackle two issues I often encountered during engagements:</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Cyberstoph&#39;s blog</title>
+    <link>https://cyberstoph.org/categories/</link>
+    <description>Recent content in Categories on Cyberstoph&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Fri, 28 Feb 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://cyberstoph.org/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>AD</title>
+      <link>https://cyberstoph.org/categories/ad/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/ad/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ADSecurity</title>
+      <link>https://cyberstoph.org/categories/adsecurity/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/adsecurity/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>AV</title>
+      <link>https://cyberstoph.org/categories/av/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/av/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Evasion</title>
+      <link>https://cyberstoph.org/categories/evasion/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/evasion/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Offense</title>
+      <link>https://cyberstoph.org/categories/offense/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/offense/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Pentest</title>
+      <link>https://cyberstoph.org/categories/pentest/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/pentest/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>PowerShell</title>
+      <link>https://cyberstoph.org/categories/powershell/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/powershell/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>RedTeaming</title>
+      <link>https://cyberstoph.org/categories/redteaming/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/redteaming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ADCS</title>
+      <link>https://cyberstoph.org/categories/adcs/</link>
+      <pubDate>Sat, 07 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/adcs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>CA</title>
+      <link>https://cyberstoph.org/categories/ca/</link>
+      <pubDate>Sat, 07 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/ca/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

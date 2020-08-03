@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CA on Cyberstoph&#39;s blog</title>
+    <link>https://cyberstoph.org/categories/ca/</link>
+    <description>Recent content in CA on Cyberstoph&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Sat, 07 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://cyberstoph.org/categories/ca/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>An introduction to Golden Certificates</title>
+      <link>https://cyberstoph.org/posts/2019/12/an-introduction-to-golden-certificates/</link>
+      <pubDate>Sat, 07 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/posts/2019/12/an-introduction-to-golden-certificates/</guid>
+      <description>TL;DR I wrote in one of my previous posts about how control over a certificate template of any kind can be abused to get a Smartcard certificate for a domain admin. In this post, I want to write a little bit more about the persistence capabilities this approach has to offer, as well as how you can detect it. I call this approach a &amp;ldquo;golden certificate&amp;rdquo; as a tribute to Benjamin Delpys famous &amp;ldquo;golden ticket&amp;rdquo;.</description>
+    </item>
+    
+    <item>
+      <title>Introducing PoshADCS</title>
+      <link>https://cyberstoph.org/posts/2019/11/introducing-poshadcs/</link>
+      <pubDate>Sat, 09 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/posts/2019/11/introducing-poshadcs/</guid>
+      <description>TL;DR;TL;DR; The script from this article leverages certificate templates to craft arbitrary smartcard logon certificates so you can impersonate any user. Use this to gain long-term stealthy persistence inside an Active Directory Domain or escalate your privileges to any user. Requirements: control over a user with write access on any kind of certificate template. The heavy lifting in the script is done with PowerView by Will Schroeder, so the kudos go to him.</description>
+    </item>
+    
+  </channel>
+</rss>

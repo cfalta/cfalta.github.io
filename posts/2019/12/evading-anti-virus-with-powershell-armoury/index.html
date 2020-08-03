@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author"
+    content="map[name:Christoph Falta]">
+<meta name="description"
+    content="TL;DR; PSArmoury is a PowerShell script that allows you to easily get the newest versions of all your favourite offensive PowerShell craft and automatically put it together in a single, encrypted .ps1-file. Think of it like a &amp;ldquo;yum update&amp;rdquo; that pipes the result in an encrypted container to take it with you. AMSI and EDR bypass included :-)
+PSArmoury I wrote my &amp;ldquo;Powershell Armoury&amp;rdquo; script a while ago to tackle two issues I often encountered during engagements:" />
+<meta name="keywords" content="it-security,information security,infosec,it,engineering,isec,blog,informatics,development,programming" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://cyberstoph.org/posts/2019/12/evading-anti-virus-with-powershell-armoury/" />
+
+
+<title>
+    
+    Evading anti-virus with Powershell Armoury :: Cyberstoph&#39;s blog  — Cyberstoph&#39;s Blog
+    
+</title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="https://cyberstoph.org/main.min.50732f89be4725d13ca6bfcdb1222c13b176cb0f7f6f721eb384c09d5423300a.css">
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cyberstoph.org/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://cyberstoph.org/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://cyberstoph.org/favicon-16x16.png">
+<link rel="manifest" href="https://cyberstoph.org/site.webmanifest">
+<link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
+<link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
+<meta name="theme-color" content="#252627"><meta itemprop="name" content="Evading anti-virus with Powershell Armoury">
+<meta itemprop="description" content="This post introduces a Powershell script for pentesters that allows easy generation of encrypted powershell toolsets">
+
+
+<meta itemprop="datePublished" content="2019-12-02T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2019-12-02T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="648">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cyberstoph.org/"/>
+
+<meta name="twitter:title" content="Evading anti-virus with Powershell Armoury"/>
+<meta name="twitter:description" content="This post introduces a Powershell script for pentesters that allows easy generation of encrypted powershell toolsets"/>
+
+
+
+<meta property="article:section" content="ADSecurity" />
+<meta property="article:section" content="AD" />
+<meta property="article:section" content="PowerShell" />
+<meta property="article:section" content="Pentest" />
+<meta property="article:section" content="RedTeaming" />
+<meta property="article:section" content="Offense" />
+<meta property="article:section" content="AV" />
+<meta property="article:section" content="Evasion" />
+
+<meta property="article:published_time" content="2019-12-02 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+    </head>
+
+    <body class="dark-theme">
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://cyberstoph.org/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">PS #&gt; </span>
+            <span class="logo__cursor"></span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://cyberstoph.org/about/">About</a></li><li><a href="https://cyberstoph.org/posts/">Posts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+
+            <span class="theme-toggle unselectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+</svg>
+</span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="https://cyberstoph.org/posts/2019/12/evading-anti-virus-with-powershell-armoury/">Evading anti-virus with Powershell Armoury</a></h2>
+
+            
+
+            <div class="post-content">
+                
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p><a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">PSArmoury</a> is a PowerShell script that allows you to easily get the newest versions of all your favourite offensive PowerShell craft and automatically put it together in a single, encrypted .ps1-file. Think of it like a &ldquo;yum update&rdquo; that pipes the result in an encrypted container to take it with you. AMSI and EDR bypass included :-)</p>
+
+<h2 id="psarmoury">PSArmoury</h2>
+
+<p>I wrote my &ldquo;Powershell Armoury&rdquo; script a while ago to tackle two issues I often encountered during engagements:</p>
+
+<ul>
+<li>First, I&rsquo;m a huge fan of PowerShell and if possible, I do everything in PowerShell. So after some time I got a pretty big list of already existing tools and self-made scripts that I want to take with me when doing a Windows or Active Directory assessment. However all these different scripts (even my own ;-)) get updated frequently and I usually ended up with some out-dated software in the field.</li>
+<li>Second, most of the existing well-known PowerShell tools like PowerView or Inveigh will be detected instantly by any anti-virus solution - at least on disk.</li>
+</ul>
+
+<p><img src="https://cyberstoph.org/img/braveheart.png" alt="braveheart" /></p>
+
+<p>So I created PSArmoury, which allows me to do the following:</p>
+
+<ul>
+<li>Create a simple json config file containing links to all my favourite tools on the internet. You only have to do this once.</li>
+<li>Then, everytime before an engagement you just run New-PSArmoury and it will automatically fetch the newest version of all those PowerShell scripts and put them together in a single, encrypted ps1-file. This is your Armoury.</li>
+</ul>
+
+<p>Let&rsquo;s have a look at that. You can find PSArmoury on <a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">Github</a>. Just download or clone and you&rsquo;re ready to go.
+First, let&rsquo;s have a look at the config. PSArmoury comes with a sample configuration file called PSArmoury.json that already references some well-known tools like PowerSploit or Inveigh. You can use this for inspiration. The configuration file is just a JSON array containing the different script files you want to include. An array member looks like this.</p>
+
+<p><img src="https://cyberstoph.org/img/psarmoury1.PNG" alt="psarmoury1" /></p>
+
+<p>Every config item consists of a name, an URL, a type and optional inclusion/exclusion filter. The major difference here is the type and there are three differen types available.</p>
+
+<ul>
+<li><strong>GitHubRepo</strong>: this instructs PSArmoury to automatically include all files in the Github Repo (that matches the Inclusion/Exclusion filter). It will ask for a Github username and personal access token since we use the Github API here.</li>
+<li><strong>GitHubItem</strong>: this instructs PSArmoury to download a single file from Github. It will ask for a Github username and personal access token since we use the Github API here.</li>
+<li><strong>WebDownloadSimple</strong>: this instructs PSArmoury to download a single file from an arbitrary webserver. No credentials needed.</li>
+</ul>
+
+<p>So in the example above, the configuration instructs PSArmoury to download all files from Kevin Robertsons repostory &ldquo;Invoke-TheHash&rdquo; that match the inclusion filter &ldquo;*.ps1&rdquo;.</p>
+
+<p>Once you have created your configuration, you can simply run</p>
+
+<pre><code>. .\New-PSArmoury.ps1
+New-PSArmoury -Path .\MyShinyNewArmoury.ps1 -Config .\PSArmoury.json
+</code></pre>
+
+<p>Note that it will require you to enter credentials to use the GitHub API. You have to enter your username and a personal access token.</p>
+
+<p>Here&rsquo;s a screenshot using the sample config that comes with PSArmoury.</p>
+
+<p><img src="https://cyberstoph.org/img/psarmoury2.PNG" alt="psarmoury1" /></p>
+
+<p>The output above mentions a password. This has been generated randomly and is included <strong>in cleartext</strong> in the resulting armoury file. This is not a problem since we use encryption only as a means of obfuscation here and not for confidentiality. Still, if you want to remove the password from your armoury you can use the <code>-OmitPassword</code> switch to do so. If you want to use a custom password or salt you can do this too by using the <code>-Password</code> and <code>-Salt</code> parameters.</p>
+
+<p>Now, how do you use your new and shiny armoury? It&rsquo;s actually very simple, just open powershell on the host of your choice and load the .ps1 file like this.</p>
+
+<pre><code>cat -raw .\MyShinyNewArmoury.ps1 | iex
+</code></pre>
+
+<p>And that&rsquo;s it. This will disable AMSI, load all encrypted blobs into powershell and then decrypt and load them in memory. Happy Hacking :-)</p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+  			</div>
+
+        
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2020</span>
+            
+                <span><a href="https://cyberstoph.org/">Christoph Falta</a></span>
+            
+            <span>Copyright <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            <span> <a href="https://cyberstoph.org/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
+        </div>
+    </div>
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+
+<script type="text/javascript" src="https://cyberstoph.org/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
+
+
+
+    </body>
+</html>
