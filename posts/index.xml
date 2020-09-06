@@ -5,8 +5,115 @@
         <description>Recent content in Posts on Cyberstoph&#39;s blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Fri, 28 Feb 2020 00:00:00 +0000</lastBuildDate>
+        <lastBuildDate>Sun, 06 Sep 2020 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://cyberstoph.org/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>ConvertTo-Powershell - wrapping applications with PS</title>
+            <link>https://cyberstoph.org/posts/2020/09/convertto-powershell-wrapping-applications-with-ps/</link>
+            <pubDate>Sun, 06 Sep 2020 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2020/09/convertto-powershell-wrapping-applications-with-ps/</guid>
+            <description>TL;DR; The newest addition to PSArmoury is a small utility script called ConvertTo-Powershell. It allows to &amp;ldquo;convert&amp;rdquo; a C# console application into a powershell script or in other words it creates a .ps1 file from a .exe file. This can be useful for bypassing AWL or AV software and if you are a similar PS-lunatic like myself, it&amp;rsquo;s also just fun :-)
+From exe to ps1 If you read one of my previous posts, you might already know that I prefer to do stuff in Powershell.</description>
+            <content type="html"><![CDATA[
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p>The newest addition to PSArmoury is a small utility script called <a href="https://github.com/cfalta/PowerShellArmoury/blob/master/ConvertTo-Powershell.ps1" target="_blank">ConvertTo-Powershell</a>. It allows to &ldquo;convert&rdquo; a C# console application into a powershell script or in other words it creates a .ps1 file from a .exe file.
+This can be useful for bypassing AWL or AV software and if you are a similar PS-lunatic like myself, it&rsquo;s also just fun :-)</p>
+
+<h2 id="from-exe-to-ps1">From exe to ps1</h2>
+
+<p>If you read one of my previous posts, you might already know that I prefer to do stuff in Powershell. One of my pet projects is the PowerShellArmoury, which allows you to store other PowerShell code in a single, encrypted .ps1-file called a &ldquo;loader&rdquo;. The loader, when invoked, tries to bypass the Windows Anti-Malware-Scan-Interface (AMSI) and then decrypts and loads the original Powershell code in the current session.</p>
+
+<p>That works pretty well for Powershell but since pure .NET is the popular kid in town right now, more and more fancy tools are written in C# and no longer in PS. Therefore, I was looking for a way to integrate things like <a href="https://github.com/GhostPack/" target="_blank">Ghostpack</a> into my existing armoury and found the solution pretty much at the end of the <a href="https://github.com/GhostPack/Rubeus#sidenote-running-rubeus-through-powershell" target="_blank">Rubeus wiki</a>.</p>
+
+<pre><code>$RubeusAssembly = [System.Reflection.Assembly]::Load([Convert]::FromBase64String(&quot;aa...&quot;))
+</code></pre>
+
+<p>The command above uses the <code>System.Reflection</code> namespace to load a compiled C# console application into your active Powershell session. You can then execute the methods within directly from Powershell. Pretty cool I&rsquo;d say but how does it work?</p>
+
+<h2 id="a-quick-peak-into-reflection">A quick peak into reflection</h2>
+
+<p>First of all: I am not a software developer and I never learned software engineering. So if you find any conceptual mistakes or other nonsense in this post, please let me know so I can learn :)
+That said, let&rsquo;s take a quick look at the concept of &ldquo;reflection&rdquo; in the .NET framework.</p>
+
+<p>Reflection allows you to programmatically obtain information about .NET assemblies (.exe and .dll files written in .NET). In other words: you can write a .NET application that dynamically interacts with other, already compiled, .NET applications on your system. But the classes in the <code>Reflection.Assembly</code> namespace not only allow to query classes, methods and attributes from assemblies but also to instantiate new objects from these classes (=run them).</p>
+
+<p>To get started, you need the <code>[System.Reflection.Assembly]::Load</code>-class. If you have a look at the <a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.load?view=netframework-4.8" target="_blank">docs</a>, you&rsquo;ll see that we can load an assembly by handing a base64 encoded blob of the assembly to the <code>Load</code>-function.</p>
+
+<p><img src="/img/5_assemblyload.png" alt="assemblyload" /></p>
+
+<p>That&rsquo;s espescially useful since converting stuff into base64 means we can embed it into a PS script</p>
+
+<p><code>$file = [Convert]::ToBase64String([IO.File]::ReadAllBytes(&quot;.\Rubeus.exe&quot;))</code></p>
+
+<p>Next, we create an object of type <a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly?view=netframework-4.8" target="_blank">assembly</a></p>
+
+<p><code>$Assembly = [System.Reflection.Assembly]::Load([Convert]::FromBase64String($file))</code></p>
+
+<p>Now we are able to enumerate the available types. The screenshot below is an excerpt of Rubeus.</p>
+
+<p><code>$Assembly.GetTypes()</code></p>
+
+<p><img src="/img/5_availabletypes.png" alt="availabletypes" /></p>
+
+<p>Also of interest to our specific usecase is the entrypoint.</p>
+
+<p><code>$Assembly.EntryPoint | select Name,ReflectedType,Module</code></p>
+
+<p><img src="/img/5_entrypoint.png" alt="entrypoint" /></p>
+
+<p>The image above tells us that the operating system would start execution of <code>Rubeus.exe</code> in the function <code>Main</code> of the namespace/class <code>Rubeus.Program</code>. If we want to run Rubeus manually, that&rsquo;s the information we need.</p>
+
+<h2 id="convertto-powershell">ConvertTo-Powershell</h2>
+
+<p>With the knowledge about the entrypoint, we&rsquo;ve got all we need to automatically create a .ps1 wrapper for a given .NET assembly.</p>
+
+<p><strong>Step 1 - Load the assembly and get the entrypoint</strong></p>
+
+<pre><code>function Get-EntryPoint
+{
+    [CmdletBinding()]
+    Param (
+    [Parameter(Mandatory = $true)]
+    [ValidateScript({Test-Path $_})]
+    [String]
+    $Path)
+
+    $item = Get-Item -Path $Path
+    $file = [Convert]::ToBase64String([IO.File]::ReadAllBytes($item.FullName))
+    $Assembly = [System.Reflection.Assembly]::Load([Convert]::FromBase64String($file))
+    $Assembly.EntryPoint
+}
+</code></pre>
+
+<p><strong>Step 2 - Build the command that will execute the entrypoint in the wrapper script</strong></p>
+
+<pre><code>$ep = Get-EntryPoint -Path C:\path\yourfile.exe
+$ldrcommand = &quot;[&quot; + $ep.reflectedtype.namespace + &quot;.&quot; + $ep.reflectedtype.name + &quot;]::&quot; + $ep.name + '($Command.Split(&quot; &quot;))'
+</code></pre>
+
+<p>Note that we&rsquo;ll also pass commandline parameters to <code>$ep.name</code> through the use of the <code>$Command</code> parameter. The later will be available in the wrapper script.</p>
+
+<p><strong>Step 3 - combine</strong></p>
+
+<p>Finally, we&rsquo;ll put these two things together in addition to some standard PSArmoury routines for encryption/decryption and AV bypass as needed. The result will be a .ps1 file, which contains the base64-encoded (and encrypted) assembly as well as the information on how to invoke it directly from PowerShell as described above. Have a look at the last two lines in the screenshot below.</p>
+
+<p><img src="/img/5_finalexample1.png" alt="finalexample1" /></p>
+
+<p>And that&rsquo;s it. Feel free to try and let me know what I missed (pretty sure I missed something ;-) ). Here&rsquo;s an example for how to use it.</p>
+
+<p><img src="/img/5_finalexample2.png" alt="finalexample1" /></p>
+
+<p>One last note: if you get an error message like the one below when running ConvertTo-Powershell, then that&rsquo;s probably AMSI complaining about the file you want to convert. In my example, thats Rubeus.exe.</p>
+
+<p><img src="/img/5_finalexample3.png" alt="finalexample1" /></p>
+
+<p>So don&rsquo;t forget to disable or bypass AMSI on the machine you use to convert. The AMSI bypass that comes with ConvertTo-Powershell is only executed in the .ps1 files you create but not in the builder function. You can find a standalone version of that one <a href="https://github.com/cfalta/PoshRandom/blob/master/Disable-AMSI.ps1" target="_blank">over here</a></p>
+]]></content>
+        </item>
         
         <item>
             <title>PSArmoury 1.4 - now with even more armour</title>

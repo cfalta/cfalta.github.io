@@ -3,6 +3,66 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://cyberstoph.org/categories/.net/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/av/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/c#/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/posts/2020/09/convertto-powershell-wrapping-applications-with-ps/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/evasion/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/offensivepowershell/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/pentest/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/posts/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/powershell/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/redteaming/</loc>
+    <lastmod>2020-09-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://cyberstoph.org/categories/ad/</loc>
     <lastmod>2020-02-28T00:00:00+00:00</lastmod>
   </url>
@@ -13,52 +73,12 @@
   </url>
   
   <url>
-    <loc>https://cyberstoph.org/categories/av/</loc>
-    <lastmod>2020-02-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/categories/</loc>
-    <lastmod>2020-02-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/</loc>
-    <lastmod>2020-02-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/categories/evasion/</loc>
-    <lastmod>2020-02-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://cyberstoph.org/categories/offense/</loc>
     <lastmod>2020-02-28T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://cyberstoph.org/categories/pentest/</loc>
-    <lastmod>2020-02-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/posts/</loc>
-    <lastmod>2020-02-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/categories/powershell/</loc>
-    <lastmod>2020-02-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://cyberstoph.org/posts/2020/02/psarmoury-1.4-now-with-even-more-armour/</loc>
-    <lastmod>2020-02-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/categories/redteaming/</loc>
     <lastmod>2020-02-28T00:00:00+00:00</lastmod>
   </url>
   
