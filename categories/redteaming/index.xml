@@ -6,10 +6,21 @@
     <description>Recent content in RedTeaming on Cyberstoph&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Sun, 06 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 03 May 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://cyberstoph.org/categories/redteaming/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Fun with processes - Suspend and Resume</title>
+      <link>https://cyberstoph.org/posts/2021/05/fun-with-processes-suspend-and-resume/</link>
+      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/posts/2021/05/fun-with-processes-suspend-and-resume/</guid>
+      <description>Did you ever wonder how process suspension in Windows works? Nevermind, I&amp;rsquo;m writing this anyway.
+Since you&amp;rsquo;re reading this blog you&amp;rsquo;re either totatlly lost or into Windows anyway. So I assume you alread tried suspending and resuming a process with process explorer for example. There are actually different ways to suspend a process and we&amp;rsquo;ll go with the one that&amp;rsquo;s officially undocumented (more fun).
+NTSuspendProcess The API we&amp;rsquo;re using is called NTSuspendProcess and lives inside NTDLL.</description>
+    </item>
     
     <item>
       <title>ConvertTo-Powershell - wrapping applications with PS</title>

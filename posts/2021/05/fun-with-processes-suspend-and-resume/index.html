@@ -5,17 +5,19 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author"
-    content="Christoph Falta ">
+    content="map[name:Christoph Falta]">
 <meta name="description"
-    content="" />
+    content="Did you ever wonder how process suspension in Windows works? Nevermind, I&amp;rsquo;m writing this anyway.
+Since you&amp;rsquo;re reading this blog you&amp;rsquo;re either totatlly lost or into Windows anyway. So I assume you alread tried suspending and resuming a process with process explorer for example. There are actually different ways to suspend a process and we&amp;rsquo;ll go with the one that&amp;rsquo;s officially undocumented (more fun).
+NTSuspendProcess The API we&amp;rsquo;re using is called NTSuspendProcess and lives inside NTDLL." />
 <meta name="keywords" content="it-security,information security,infosec,it,engineering,isec,blog,informatics,development,programming" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="https://cyberstoph.org/404.html" />
+<link rel="canonical" href="https://cyberstoph.org/posts/2021/05/fun-with-processes-suspend-and-resume/" />
 
 
 <title>
     
-    404 Page not found :: Cyberstoph&#39;s blog  — Cyberstoph&#39;s Blog
+    Fun with processes - Suspend and Resume :: Cyberstoph&#39;s blog  — Cyberstoph&#39;s Blog
     
 </title>
 
@@ -36,18 +38,34 @@
 <link rel="manifest" href="https://cyberstoph.org/site.webmanifest">
 <link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
 <link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
-<meta name="theme-color" content="#252627"><meta itemprop="name" content="404 Page not found">
-<meta itemprop="description" content="Blog by Christoph Falta">
+<meta name="theme-color" content="#252627"><meta itemprop="name" content="Fun with processes - Suspend and Resume">
+<meta itemprop="description" content="Fun with processes - Suspend and Resume">
 
+
+<meta itemprop="datePublished" content="2021-05-03T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-05-03T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="218">
+
+
+
+<meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://cyberstoph.org/"/>
 
-<meta name="twitter:title" content="404 Page not found"/>
-<meta name="twitter:description" content="Blog by Christoph Falta"/>
+<meta name="twitter:title" content="Fun with processes - Suspend and Resume"/>
+<meta name="twitter:description" content="Fun with processes - Suspend and Resume"/>
 
 
 
+<meta property="article:section" content=".NET" />
+<meta property="article:section" content="PowerShell" />
+<meta property="article:section" content="OffensivePowerShell" />
+<meta property="article:section" content="Pentest" />
+<meta property="article:section" content="RedTeaming" />
+<meta property="article:section" content="C#" />
+<meta property="article:section" content="WindowsInternals" />
 
+<meta property="article:published_time" content="2021-05-03 00:00:00 &#43;0000 UTC" />
 
 
 
@@ -100,19 +118,63 @@
 
             <div class="content">
                 
-    <div id="spotlight" class="error-404 animated fadeIn">
-        <p class="img-404">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-cloud-drizzle"><line x1="8" y1="19" x2="8" y2="21"></line><line x1="8" y1="13" x2="8" y2="15"></line><line x1="16" y1="19" x2="16" y2="21"></line><line x1="16" y1="13" x2="16" y2="15"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="12" y1="15" x2="12" y2="17"></line><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg>
-        </p>
-        <div class="banner-404">
-            <h1>404</h1>
-            <p>Oops, page not found…</p>
-            <p class="btn-404">
-                <a href="https://cyberstoph.org/"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>Home</a>
-                <a href="https://cyberstoph.org/posts"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-archive"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>Archives</a>
+    <main class="post">
+
+        <div class="post-info">
+            
             </p>
         </div>
-    </div>
+
+        <article>
+            <h2 class="post-title"><a href="https://cyberstoph.org/posts/2021/05/fun-with-processes-suspend-and-resume/">Fun with processes - Suspend and Resume</a></h2>
+
+            
+
+            <div class="post-content">
+                
+
+<p>Did you ever wonder how process suspension in Windows works? Nevermind, I&rsquo;m writing this anyway.</p>
+
+<p>Since you&rsquo;re reading this blog you&rsquo;re either totatlly lost or into Windows anyway. So I assume you alread tried suspending and resuming a process with process explorer for example. There are actually different ways to suspend a process and we&rsquo;ll go with the one that&rsquo;s officially undocumented (more fun).</p>
+
+<h2 id="ntsuspendprocess">NTSuspendProcess</h2>
+
+<p>The API we&rsquo;re using is called <strong>NTSuspendProcess</strong> and lives inside NTDLL. It is not documented officially as mentioned above, however it is already well known for years and you find a lot of information about it on the internet. It looks like this:</p>
+
+<pre><code>[DllImport(&quot;ntdll.dll&quot;, PreserveSig = false)]
+public static extern void NtSuspendProcess(IntPtr processHandle);
+</code></pre>
+
+<p>Quite simple, the only thing we need is a process handle with the appropriate (= ALL) permissions. And you might already guessed it, resuming the process works the same way.</p>
+
+<pre><code>[DllImport(&quot;ntdll.dll&quot;, PreserveSig = false, SetLastError = true)]
+public static extern void NtResumeProcess(IntPtr processHandle);
+</code></pre>
+
+<p>To make things work, we also need <strong>OpenProcess</strong> and <strong>CloseHandle</strong> from kernel32 to acquire and release the process handle.</p>
+
+<pre><code>[DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+public static extern IntPtr OpenProcess(ProcessAccessFlags processAccess,bool bInheritHandle,int processId);
+[DllImport(&quot;kernel32.dll&quot;, SetLastError=true)]
+public static extern bool CloseHandle(IntPtr hObject)
+</code></pre>
+
+<p>And that&rsquo;s it. Nothing fancy here today ;-)</p>
+
+<p>If you&rsquo;re interested, <a href="https://github.com/cfalta/PoshRandom/blob/master/ProcessSuspendResume.ps1" target="_blank">here&rsquo;s a Powershell function</a> to play with.</p>
+
+<p><img src="https://cyberstoph.org/img/6_processsuspendresume_1.png" alt="suspendresume" /></p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+  			</div>
+
+        
+    </main>
 
             </div>
 

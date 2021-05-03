@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>C# on Cyberstoph&#39;s blog</title>
-    <link>https://cyberstoph.org/categories/c#/</link>
-    <description>Recent content in C# on Cyberstoph&#39;s blog</description>
+    <title>WindowsInternals on Cyberstoph&#39;s blog</title>
+    <link>https://cyberstoph.org/categories/windowsinternals/</link>
+    <description>Recent content in WindowsInternals on Cyberstoph&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
     <lastBuildDate>Mon, 03 May 2021 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://cyberstoph.org/categories/c#/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://cyberstoph.org/categories/windowsinternals/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -20,16 +20,6 @@
       <description>Did you ever wonder how process suspension in Windows works? Nevermind, I&amp;rsquo;m writing this anyway.
 Since you&amp;rsquo;re reading this blog you&amp;rsquo;re either totatlly lost or into Windows anyway. So I assume you alread tried suspending and resuming a process with process explorer for example. There are actually different ways to suspend a process and we&amp;rsquo;ll go with the one that&amp;rsquo;s officially undocumented (more fun).
 NTSuspendProcess The API we&amp;rsquo;re using is called NTSuspendProcess and lives inside NTDLL.</description>
-    </item>
-    
-    <item>
-      <title>ConvertTo-Powershell - wrapping applications with PS</title>
-      <link>https://cyberstoph.org/posts/2020/09/convertto-powershell-wrapping-applications-with-ps/</link>
-      <pubDate>Sun, 06 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/posts/2020/09/convertto-powershell-wrapping-applications-with-ps/</guid>
-      <description>TL;DR; The newest addition to PSArmoury is a small utility script called ConvertTo-Powershell. It allows to &amp;ldquo;convert&amp;rdquo; a C# console application into a powershell script or in other words it creates a .ps1 file from a .exe file. This can be useful for bypassing AWL or AV software and if you are a similar PS-lunatic like myself, it&amp;rsquo;s also just fun :-)
-From exe to ps1 If you read one of my previous posts, you might already know that I prefer to do stuff in Powershell.</description>
     </item>
     
   </channel>

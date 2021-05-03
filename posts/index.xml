@@ -5,8 +5,53 @@
         <description>Recent content in Posts on Cyberstoph&#39;s blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Sun, 06 Sep 2020 00:00:00 +0000</lastBuildDate>
+        <lastBuildDate>Mon, 03 May 2021 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://cyberstoph.org/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Fun with processes - Suspend and Resume</title>
+            <link>https://cyberstoph.org/posts/2021/05/fun-with-processes-suspend-and-resume/</link>
+            <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2021/05/fun-with-processes-suspend-and-resume/</guid>
+            <description>Did you ever wonder how process suspension in Windows works? Nevermind, I&amp;rsquo;m writing this anyway.
+Since you&amp;rsquo;re reading this blog you&amp;rsquo;re either totatlly lost or into Windows anyway. So I assume you alread tried suspending and resuming a process with process explorer for example. There are actually different ways to suspend a process and we&amp;rsquo;ll go with the one that&amp;rsquo;s officially undocumented (more fun).
+NTSuspendProcess The API we&amp;rsquo;re using is called NTSuspendProcess and lives inside NTDLL.</description>
+            <content type="html"><![CDATA[
+
+<p>Did you ever wonder how process suspension in Windows works? Nevermind, I&rsquo;m writing this anyway.</p>
+
+<p>Since you&rsquo;re reading this blog you&rsquo;re either totatlly lost or into Windows anyway. So I assume you alread tried suspending and resuming a process with process explorer for example. There are actually different ways to suspend a process and we&rsquo;ll go with the one that&rsquo;s officially undocumented (more fun).</p>
+
+<h2 id="ntsuspendprocess">NTSuspendProcess</h2>
+
+<p>The API we&rsquo;re using is called <strong>NTSuspendProcess</strong> and lives inside NTDLL. It is not documented officially as mentioned above, however it is already well known for years and you find a lot of information about it on the internet. It looks like this:</p>
+
+<pre><code>[DllImport(&quot;ntdll.dll&quot;, PreserveSig = false)]
+public static extern void NtSuspendProcess(IntPtr processHandle);
+</code></pre>
+
+<p>Quite simple, the only thing we need is a process handle with the appropriate (= ALL) permissions. And you might already guessed it, resuming the process works the same way.</p>
+
+<pre><code>[DllImport(&quot;ntdll.dll&quot;, PreserveSig = false, SetLastError = true)]
+public static extern void NtResumeProcess(IntPtr processHandle);
+</code></pre>
+
+<p>To make things work, we also need <strong>OpenProcess</strong> and <strong>CloseHandle</strong> from kernel32 to acquire and release the process handle.</p>
+
+<pre><code>[DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+public static extern IntPtr OpenProcess(ProcessAccessFlags processAccess,bool bInheritHandle,int processId);
+[DllImport(&quot;kernel32.dll&quot;, SetLastError=true)]
+public static extern bool CloseHandle(IntPtr hObject)
+</code></pre>
+
+<p>And that&rsquo;s it. Nothing fancy here today ;-)</p>
+
+<p>If you&rsquo;re interested, <a href="https://github.com/cfalta/PoshRandom/blob/master/ProcessSuspendResume.ps1" target="_blank">here&rsquo;s a Powershell function</a> to play with.</p>
+
+<p><img src="/img/6_processsuspendresume_1.png" alt="suspendresume" /></p>
+]]></content>
+        </item>
         
         <item>
             <title>ConvertTo-Powershell - wrapping applications with PS</title>
