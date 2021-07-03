@@ -6,10 +6,73 @@
     <description>Recent content in Categories on Cyberstoph&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Mon, 03 May 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 26 Jun 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://cyberstoph.org/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ActiveDirectory</title>
+      <link>https://cyberstoph.org/categories/activedirectory/</link>
+      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/activedirectory/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kerberos</title>
+      <link>https://cyberstoph.org/categories/kerberos/</link>
+      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/kerberos/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>LocalPrivilegeEscalation</title>
+      <link>https://cyberstoph.org/categories/localprivilegeescalation/</link>
+      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/localprivilegeescalation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>OffensivePowerShell</title>
+      <link>https://cyberstoph.org/categories/offensivepowershell/</link>
+      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/offensivepowershell/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Pentest</title>
+      <link>https://cyberstoph.org/categories/pentest/</link>
+      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/pentest/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>RedTeaming</title>
+      <link>https://cyberstoph.org/categories/redteaming/</link>
+      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/redteaming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>s4u</title>
+      <link>https://cyberstoph.org/categories/s4u/</link>
+      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/s4u/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>.NET</title>
@@ -30,74 +93,11 @@
     </item>
     
     <item>
-      <title>OffensivePowerShell</title>
-      <link>https://cyberstoph.org/categories/offensivepowershell/</link>
-      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/offensivepowershell/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Pentest</title>
-      <link>https://cyberstoph.org/categories/pentest/</link>
-      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/pentest/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>PowerShell</title>
       <link>https://cyberstoph.org/categories/powershell/</link>
       <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
       
       <guid>https://cyberstoph.org/categories/powershell/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>RedTeaming</title>
-      <link>https://cyberstoph.org/categories/redteaming/</link>
-      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/redteaming/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>WindowsInternals</title>
-      <link>https://cyberstoph.org/categories/windowsinternals/</link>
-      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/windowsinternals/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>AV</title>
-      <link>https://cyberstoph.org/categories/av/</link>
-      <pubDate>Sun, 06 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/av/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Evasion</title>
-      <link>https://cyberstoph.org/categories/evasion/</link>
-      <pubDate>Sun, 06 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/evasion/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>AD</title>
-      <link>https://cyberstoph.org/categories/ad/</link>
-      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/ad/</guid>
       <description></description>
     </item>
     

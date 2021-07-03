@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author"
+    content="map[name:Christoph Falta]">
+<meta name="description"
+    content="TL;DR;
+S4U2self can be abused for local privilege escalation (think: Network Service to Local Admin). This is not something new, it&amp;rsquo;s just the first time I actually ran through the steps myself so why not write a post about it. The attack is covered briefly in the Rubeus manual and in more detail in this post by Charlie Clark, which I recommend you read. I won&amp;rsquo;t explain S4U in this post so if you are not familiar with the topic, read this post on constrained delegation first." />
+<meta name="keywords" content="it-security,information security,infosec,it,engineering,isec,blog,informatics,development,programming" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/" />
+
+
+<title>
+    
+    Abusing Kerberos S4U2self for local privilege escalation :: Cyberstoph&#39;s blog  — Cyberstoph&#39;s Blog
+    
+</title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="https://cyberstoph.org/main.min.50732f89be4725d13ca6bfcdb1222c13b176cb0f7f6f721eb384c09d5423300a.css">
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cyberstoph.org/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://cyberstoph.org/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://cyberstoph.org/favicon-16x16.png">
+<link rel="manifest" href="https://cyberstoph.org/site.webmanifest">
+<link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
+<link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
+<meta name="theme-color" content="#252627"><meta itemprop="name" content="Abusing Kerberos S4U2self for local privilege escalation">
+<meta itemprop="description" content="Abusing Kerberos S4U2self for local privilege escalation">
+
+
+<meta itemprop="datePublished" content="2021-06-26T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-06-26T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="582">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cyberstoph.org/"/>
+
+<meta name="twitter:title" content="Abusing Kerberos S4U2self for local privilege escalation"/>
+<meta name="twitter:description" content="Abusing Kerberos S4U2self for local privilege escalation"/>
+
+
+
+<meta property="article:section" content="Kerberos" />
+<meta property="article:section" content="ActiveDirectory" />
+<meta property="article:section" content="OffensivePowerShell" />
+<meta property="article:section" content="Pentest" />
+<meta property="article:section" content="RedTeaming" />
+<meta property="article:section" content="LocalPrivilegeEscalation" />
+<meta property="article:section" content="s4u" />
+
+<meta property="article:published_time" content="2021-06-26 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+    </head>
+
+    <body class="dark-theme">
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://cyberstoph.org/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">PS #&gt; </span>
+            <span class="logo__cursor"></span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://cyberstoph.org/about/">About</a></li><li><a href="https://cyberstoph.org/posts/">Posts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+
+            <span class="theme-toggle unselectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+</svg>
+</span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/">Abusing Kerberos S4U2self for local privilege escalation</a></h2>
+
+            
+
+            <div class="post-content">
+                
+
+<p><strong>TL;DR;</strong></p>
+
+<p>S4U2self can be abused for local privilege escalation (think: Network Service to Local Admin). This is not something new, it&rsquo;s just the first time I actually ran through the steps myself so why not write a post about it. The attack is covered briefly in the <a href="https://github.com/GhostPack/Rubeus#constrained-delegation-abuse" target="_blank">Rubeus manual</a> and in more detail in <a href="https://exploit.ph/revisiting-delegate-2-thyself.html" target="_blank">this post</a> by Charlie Clark, which I recommend you read.
+I won&rsquo;t explain S4U in this post so if you are not familiar with the topic, read <a href="http://www.harmj0y.net/blog/activedirectory/S4U2pwnage/" target="_blank">this post</a> on constrained delegation first.</p>
+
+<h2 id="s4u2self-and-service-accounts">S4U2self and service accounts</h2>
+
+<p>Though constrained delegation needs to be specifically enabled on an account to &ldquo;make it work&rdquo; across systems in terms of S4U2proxy, S4U2self can be invoked by any principal with an SPN. From a conceptual perspective it does not seem like much at first, since you can&rsquo;t use the ticket to invoke S4U2proxy, which means that you end up with a ticket for yourself. And you already are you, so no problem here right?</p>
+
+<p>It depends. If you already have administrative privileges on a computer, then the ticket really is of no use for you. But if you think about a common local privilege escalation scenario in which you managed to compromise a restriced service like IIS (running as AppPool user) or MSSQL (running as network service by default), that ticket can be quite valuable.</p>
+
+<p>The &ldquo;Network Service&rdquo; account and the AppPool identities can act as the computer account in terms of Active Directory, they are only restrained locally. Therefore it is possible to invoke S4U2self if you run as one of these and request a service ticket for any user (e.g. someone with local admin rights, like DA) to yourself.
+There are however two minor obstacles to overcome:</p>
+
+<ul>
+<li>we need a TGT or the computer accounts credentials to invoke S4U2self and we start with neither of both</li>
+<li>the SPN in the ticket returned by S4U2self is set to &ldquo;Computername$&rdquo; by default</li>
+</ul>
+
+<h2 id="getting-the-tgt">Getting the TGT</h2>
+
+<p>A usable TGT for the computer account can be acquired using <a href="https://twitter.com/gentilkiwi" target="_blank">@gentilkiwi</a>&rsquo;s <code>tgt::deleg</code> trick, explained <a href="https://github.com/GhostPack/Rubeus#tgtdeleg" target="_blank">here</a> in the Rubeus manual.</p>
+
+<pre><code>Invoke-Rubeus -Command &quot;tgtdeleg /nowrap&quot;
+</code></pre>
+
+<p><img src="https://cyberstoph.org/img/7_tgtdeleg.png" alt="tgtdeleg" /></p>
+
+<h2 id="fixing-the-spn">Fixing the SPN</h2>
+
+<p>With the TGT from the previous step, we can now invoke S4U2self to request a ticket for the User Chuck Norris, who is obviously a domain admin.</p>
+
+<pre><code>Invoke-Rubeus -Command &quot;s4u /self /nowrap /impersonateuser:cnorris /ticket:base64blobhere...&quot;
+</code></pre>
+
+<p><img src="https://cyberstoph.org/img/7_s4u2self.png" alt="tgtdeleg" /></p>
+
+<p>Here&rsquo;s how the resultibng ticket looks like. As you can see, it is issued to &ldquo;ADSEC-00$&rdquo; which is the name of the computer we are running on.</p>
+
+<p><img src="https://cyberstoph.org/img/7_describe.png" alt="tgtdeleg" /></p>
+
+<p>We cannot use this ticket from another host since it is not issued to a valid SPN for our usecase. Luckily, the SPN is not part of the protected information inside the ticket and we can simply change it. Rubeus offers a command called <code>tgssub</code> to do just that, which is also explained in the <a href="https://github.com/GhostPack/Rubeus#tgssub" target="_blank">manual</a>. Use it together with the <code>/altservice</code> switch to provide a different SPN.</p>
+
+<pre><code>Invoke-Rubeus -Command &quot;tgssub /altservice:http/adsec-00.contoso.com /ticket:base64blobhere... &quot;
+</code></pre>
+
+<p><img src="https://cyberstoph.org/img/7_tgssub.png" alt="tgtdeleg" /></p>
+
+<p>You can then copy the ticket to a different host, import it (you do not need local admin rights for that) and use the ticket.</p>
+
+<p><img src="https://cyberstoph.org/img/7_tgssub_ptt.png" alt="tgtdeleg" /></p>
+
+<p>In the screenshot below we are using PSRemoting (hence the HTTP/.. SPN).</p>
+
+<p><img src="https://cyberstoph.org/img/7_tgssub_ptt_2.png" alt="tgtdeleg" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I think this is a very stable alternative to the various potatoe vectors. If you previously considered processes running as <code>LOCAL SYSTEM</code> as your main target for local privilege escalation, you can now safely increase your scope. As long as you have access to another computer in the domain, chances are very high that this will work.</p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+  			</div>
+
+        
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2021</span>
+            
+                <span><a href="https://cyberstoph.org/">Christoph Falta</a></span>
+            
+            <span>Copyright <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            <span> <a href="https://cyberstoph.org/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
+        </div>
+    </div>
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+
+<script type="text/javascript" src="https://cyberstoph.org/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
+
+
+
+    </body>
+</html>

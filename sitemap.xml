@@ -3,6 +3,61 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/activedirectory/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/kerberos/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/localprivilegeescalation/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/offensivepowershell/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/pentest/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/posts/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/redteaming/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/s4u/</loc>
+    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://cyberstoph.org/categories/.net/</loc>
     <lastmod>2021-05-03T00:00:00+00:00</lastmod>
   </url>
@@ -13,42 +68,12 @@
   </url>
   
   <url>
-    <loc>https://cyberstoph.org/categories/</loc>
-    <lastmod>2021-05-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/</loc>
-    <lastmod>2021-05-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://cyberstoph.org/posts/2021/05/fun-with-processes-suspend-and-resume/</loc>
     <lastmod>2021-05-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://cyberstoph.org/categories/offensivepowershell/</loc>
-    <lastmod>2021-05-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/categories/pentest/</loc>
-    <lastmod>2021-05-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/posts/</loc>
-    <lastmod>2021-05-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://cyberstoph.org/categories/powershell/</loc>
-    <lastmod>2021-05-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/categories/redteaming/</loc>
     <lastmod>2021-05-03T00:00:00+00:00</lastmod>
   </url>
   

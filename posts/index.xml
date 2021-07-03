@@ -5,8 +5,80 @@
         <description>Recent content in Posts on Cyberstoph&#39;s blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Mon, 03 May 2021 00:00:00 +0000</lastBuildDate>
+        <lastBuildDate>Sat, 26 Jun 2021 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://cyberstoph.org/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Abusing Kerberos S4U2self for local privilege escalation</title>
+            <link>https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/</link>
+            <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/</guid>
+            <description>TL;DR;
+S4U2self can be abused for local privilege escalation (think: Network Service to Local Admin). This is not something new, it&amp;rsquo;s just the first time I actually ran through the steps myself so why not write a post about it. The attack is covered briefly in the Rubeus manual and in more detail in this post by Charlie Clark, which I recommend you read. I won&amp;rsquo;t explain S4U in this post so if you are not familiar with the topic, read this post on constrained delegation first.</description>
+            <content type="html"><![CDATA[
+
+<p><strong>TL;DR;</strong></p>
+
+<p>S4U2self can be abused for local privilege escalation (think: Network Service to Local Admin). This is not something new, it&rsquo;s just the first time I actually ran through the steps myself so why not write a post about it. The attack is covered briefly in the <a href="https://github.com/GhostPack/Rubeus#constrained-delegation-abuse" target="_blank">Rubeus manual</a> and in more detail in <a href="https://exploit.ph/revisiting-delegate-2-thyself.html" target="_blank">this post</a> by Charlie Clark, which I recommend you read.
+I won&rsquo;t explain S4U in this post so if you are not familiar with the topic, read <a href="http://www.harmj0y.net/blog/activedirectory/S4U2pwnage/" target="_blank">this post</a> on constrained delegation first.</p>
+
+<h2 id="s4u2self-and-service-accounts">S4U2self and service accounts</h2>
+
+<p>Though constrained delegation needs to be specifically enabled on an account to &ldquo;make it work&rdquo; across systems in terms of S4U2proxy, S4U2self can be invoked by any principal with an SPN. From a conceptual perspective it does not seem like much at first, since you can&rsquo;t use the ticket to invoke S4U2proxy, which means that you end up with a ticket for yourself. And you already are you, so no problem here right?</p>
+
+<p>It depends. If you already have administrative privileges on a computer, then the ticket really is of no use for you. But if you think about a common local privilege escalation scenario in which you managed to compromise a restriced service like IIS (running as AppPool user) or MSSQL (running as network service by default), that ticket can be quite valuable.</p>
+
+<p>The &ldquo;Network Service&rdquo; account and the AppPool identities can act as the computer account in terms of Active Directory, they are only restrained locally. Therefore it is possible to invoke S4U2self if you run as one of these and request a service ticket for any user (e.g. someone with local admin rights, like DA) to yourself.
+There are however two minor obstacles to overcome:</p>
+
+<ul>
+<li>we need a TGT or the computer accounts credentials to invoke S4U2self and we start with neither of both</li>
+<li>the SPN in the ticket returned by S4U2self is set to &ldquo;Computername$&rdquo; by default</li>
+</ul>
+
+<h2 id="getting-the-tgt">Getting the TGT</h2>
+
+<p>A usable TGT for the computer account can be acquired using <a href="https://twitter.com/gentilkiwi" target="_blank">@gentilkiwi</a>&rsquo;s <code>tgt::deleg</code> trick, explained <a href="https://github.com/GhostPack/Rubeus#tgtdeleg" target="_blank">here</a> in the Rubeus manual.</p>
+
+<pre><code>Invoke-Rubeus -Command &quot;tgtdeleg /nowrap&quot;
+</code></pre>
+
+<p><img src="/img/7_tgtdeleg.png" alt="tgtdeleg" /></p>
+
+<h2 id="fixing-the-spn">Fixing the SPN</h2>
+
+<p>With the TGT from the previous step, we can now invoke S4U2self to request a ticket for the User Chuck Norris, who is obviously a domain admin.</p>
+
+<pre><code>Invoke-Rubeus -Command &quot;s4u /self /nowrap /impersonateuser:cnorris /ticket:base64blobhere...&quot;
+</code></pre>
+
+<p><img src="/img/7_s4u2self.png" alt="tgtdeleg" /></p>
+
+<p>Here&rsquo;s how the resultibng ticket looks like. As you can see, it is issued to &ldquo;ADSEC-00$&rdquo; which is the name of the computer we are running on.</p>
+
+<p><img src="/img/7_describe.png" alt="tgtdeleg" /></p>
+
+<p>We cannot use this ticket from another host since it is not issued to a valid SPN for our usecase. Luckily, the SPN is not part of the protected information inside the ticket and we can simply change it. Rubeus offers a command called <code>tgssub</code> to do just that, which is also explained in the <a href="https://github.com/GhostPack/Rubeus#tgssub" target="_blank">manual</a>. Use it together with the <code>/altservice</code> switch to provide a different SPN.</p>
+
+<pre><code>Invoke-Rubeus -Command &quot;tgssub /altservice:http/adsec-00.contoso.com /ticket:base64blobhere... &quot;
+</code></pre>
+
+<p><img src="/img/7_tgssub.png" alt="tgtdeleg" /></p>
+
+<p>You can then copy the ticket to a different host, import it (you do not need local admin rights for that) and use the ticket.</p>
+
+<p><img src="/img/7_tgssub_ptt.png" alt="tgtdeleg" /></p>
+
+<p>In the screenshot below we are using PSRemoting (hence the HTTP/.. SPN).</p>
+
+<p><img src="/img/7_tgssub_ptt_2.png" alt="tgtdeleg" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I think this is a very stable alternative to the various potatoe vectors. If you previously considered processes running as <code>LOCAL SYSTEM</code> as your main target for local privilege escalation, you can now safely increase your scope. As long as you have access to another computer in the domain, chances are very high that this will work.</p>
+]]></content>
+        </item>
         
         <item>
             <title>Fun with processes - Suspend and Resume</title>
