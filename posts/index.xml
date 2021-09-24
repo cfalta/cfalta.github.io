@@ -5,8 +5,67 @@
         <description>Recent content in Posts on Cyberstoph&#39;s blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Sat, 26 Jun 2021 00:00:00 +0000</lastBuildDate>
+        <lastBuildDate>Fri, 24 Sep 2021 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://cyberstoph.org/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>After the storm - how to move on with NTLM</title>
+            <link>https://cyberstoph.org/posts/2021/09/after-the-storm-how-to-move-on-with-ntlm/</link>
+            <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+            
+            <guid>https://cyberstoph.org/posts/2021/09/after-the-storm-how-to-move-on-with-ntlm/</guid>
+            <description>I remember that, about 15 years ago, we already flagged the absence of SMB signing as a vulnerability in reports. Though at that time, we circled more around the theoretical risk of someone tampering SMB traffic due to the lack of integrity protection. None of us really had an idea how to make use of that vulnerability. The later obviously changed.
+July 2021 came and brought with it a storm of various Print Spooler RCEs (PrintNightmare), one of the simplest LPE&amp;rsquo;s Windows has seen (HiveNightmare,seriousSAM) and a little hippo (PetitPotam) who anchored the &amp;ldquo;NTLM problem&amp;rdquo; in the center of our attention.</description>
+            <content type="html"><![CDATA[
+
+<p>I remember that, about 15 years ago, we already flagged the absence of SMB signing as a vulnerability in reports. Though at that time, we circled more around the theoretical risk of someone tampering SMB traffic due to the lack of integrity protection. None of us really had an idea how to make use of that vulnerability. The later obviously changed.</p>
+
+<p>July 2021 came and brought with it a storm of various Print Spooler RCEs (PrintNightmare), one of the simplest LPE&rsquo;s Windows has seen (HiveNightmare,seriousSAM) and a little hippo (PetitPotam) who anchored the &ldquo;NTLM problem&rdquo; in the center of our attention. Now as the storm has passed, we&rsquo;re confrontated with a familiar question: &ldquo;how to get rid of NTLM?&rdquo;. And the unhappy truth is, we won&rsquo;t - at least not in the near future.</p>
+
+<p>NTLM as a technology is backed in so deep in the Windows operating system that the only realistic move away from NTLM would be during the transition to a new operating system version (like Windows 11) cause that&rsquo;s how IT departments can handle these kinds of changes. However, it seems that this train has already passed. Windows 11 will bring us a centered start menu and rounded corners but probably nothing new with regards to NTLM. How to move on then?</p>
+
+<h2 id="short-term-strategies">Short-term strategies</h2>
+
+<p>The attack-vector at hand relies on the combination of coercing an NTLM authentication through either <a href="https://github.com/leechristensen/SpoolSample" target="_blank">SpoolSample/Printerbug</a> or <a href="https://github.com/topotam/PetitPotam" target="_blank">PetitPotam</a> and then forwarding that to a useful target, like the LDAP service of the DC. Why Microsoft tries to <a href="https://msrc.microsoft.com/update-guide/vulnerability/ADV210003" target="_blank">center this issue around Active Directory Certificate Services (ESC8)</a>, though this is just one possible avenue of attack is beyond my imagination. That information misguides customers into thinking that they are not at risk if they don&rsquo;t have an ACDS web interface running, which is dangerously wrong.</p>
+
+<p>Anyway, the graphic below outlines two possible ways how this attack can play out from start to end.</p>
+
+<p><img src="/img/8_ntlmrelay1.png" alt="ntlmrelay1" /></p>
+
+<p>The path above uses the <code>msDS-KeyCredential</code> attribute to add a certificat to the account which in turn allows to request a TGT via PKINIT. The path below sets the <code>msDS-AllowedToActOnBehalfOfOtherIdentity</code> attribute, which configures resource-based constrained delegation. This gives an account of your choosing the right to delegate against the victim, so you can use S4U2Self/S4U2Proxy to get a service ticket in the name of a domain admin and on we go.</p>
+
+<p>If the last two sentences do not make any sense to you, then I recommend <a href="https://www.harmj0y.net/blog/activedirectory/a-case-study-in-wagging-the-dog-computer-takeover/" target="_blank">this article</a> on RBCD by Will Schroeder and <a href="https://posts.specterops.io/shadow-credentials-abusing-key-trust-account-mapping-for-takeover-8ee1a53566ab" target="_blank">this article</a> on Shadow Credentials by Elad Shamir.</p>
+
+<p>As you can see, regardless of the attack path, there are always a couple of different steps necessary. If you take a closer look at each step of the attack, you&rsquo;ll notice that you can put specific mitigations in place for every step. In fact, defenders have various possibilities to break this attack throughout the way. Let&rsquo;s visualice that and have a look at the graphic again.</p>
+
+<p><img src="/img/8_ntlmrelay2.png" alt="ntlmrelay2" /></p>
+
+<p>The most effective way to break these attacks in the current situation is to prevent coercion of authentication, so you stop the attack at step one. Effective in this case means with regards to the current situation. To quote my history teacher: &ldquo;there&rsquo;s a difference between the trigger and the source of a problem&rdquo;.</p>
+
+<p>If you remove PetitPotam/SpoolSample from the attack, you just kill the trigger but not the source. The source is the weakness of NTLM against relay attacks and if another PetitPotam is discovered next months, we&rsquo;ll start all over again.</p>
+
+<p>Therefore, the most sustainable measure would be to remove NTLM from the game, but let&rsquo;s discuss this in the next section. Focusing at the first path in the graphic above, you could also break the attack at the last step through disabling RC4 for Kerberos. Since you can only create RC4 silver tickets with an NTLM hash, this would thwart the whole attack path and is also relatively (sigh&hellip;) easy to implement if you focus on computer accounts and ignore user-based service accounts for the moment.</p>
+
+<p>The point I want to make here is: if you draw these graphics for all attack paths you can identify in your environment, you can find the choke points that are the easiest for you to implement in short time. This will likely not result in the best solution, but in a solution that works in your indiviudal environment.</p>
+
+<h2 id="long-term-strategies">Long-term strategies</h2>
+
+<p>As mentioned earlier, removing NTLM from the equation entirely is something only Microsoft can initiate, and it seems to me that they have chosen another path. That leaves us with two options to prevent NTLM relay sustainably:
+1. enforce signing on all relevant protocols (at least SMB, LDAP, HTTP)
+2. disable NTLM for network authentication</p>
+
+<p>Going for signing will probably be easier to achieve if you live in a relatively homogeneous Microsoft environment, but leaves the risk of a future, yet to be discovered, NTLM based attack to break your neck again. Disabling NTLM is better from a long-term perspective but could result in any number of applications breaking. You might also notice that some very common Microsoft applications rely heavily on NTLM by default (talking about you, Exchange!).</p>
+
+<p>My recommendation would be to set this up as an internal project or whatever the best formal definition in your environment is to get a hand on manpower and do two things:</p>
+
+<p>first, build awareness that NTLM needs to die (probably find better wording). This is our stretch goal. It won&rsquo;t happen any time soon but it&rsquo;s good to know where we&rsquo;re heading. Make sure that any new application works without NTLM e.g., by <a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-security-restrict-ntlm-outgoing-ntlm-traffic-to-remote-servers" target="_blank">disabling NTLM via GPO</a> on all new servers you bring to production.</p>
+
+<p>Second, enforce signing step-by-step. Start with LDAP, since this is the most relevant vector for the attacker.
+If you can remove LDAP from the equation, you remove the attacks that are possible by design like RBCD (see previous section), which should tremendously reduce the attack surface. This buys you time to implement SMB signing and you&rsquo;ll need that time since SMB signing almost certainly breaks stuff.</p>
+
+<p>Regardeless of what you do though, the most important thing is to start now. It&rsquo;s time to get rid of that evil called NTLM who is whipping our assess since Hernan Ochoa released WCE 10 years ago. Yes - TEN YEARS AGO! The storm is over&hellip;let&rsquo;s rebuild :-)</p>
+]]></content>
+        </item>
         
         <item>
             <title>Abusing Kerberos S4U2self for local privilege escalation</title>

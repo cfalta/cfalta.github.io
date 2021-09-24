@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>ActiveDirectory on Cyberstoph&#39;s blog</title>
-    <link>https://cyberstoph.org/categories/activedirectory/</link>
-    <description>Recent content in ActiveDirectory on Cyberstoph&#39;s blog</description>
+    <title>NTLM on Cyberstoph&#39;s blog</title>
+    <link>https://cyberstoph.org/categories/ntlm/</link>
+    <description>Recent content in NTLM on Cyberstoph&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
     <lastBuildDate>Fri, 24 Sep 2021 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://cyberstoph.org/categories/activedirectory/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://cyberstoph.org/categories/ntlm/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -19,16 +19,6 @@
       <guid>https://cyberstoph.org/posts/2021/09/after-the-storm-how-to-move-on-with-ntlm/</guid>
       <description>I remember that, about 15 years ago, we already flagged the absence of SMB signing as a vulnerability in reports. Though at that time, we circled more around the theoretical risk of someone tampering SMB traffic due to the lack of integrity protection. None of us really had an idea how to make use of that vulnerability. The later obviously changed.
 July 2021 came and brought with it a storm of various Print Spooler RCEs (PrintNightmare), one of the simplest LPE&amp;rsquo;s Windows has seen (HiveNightmare,seriousSAM) and a little hippo (PetitPotam) who anchored the &amp;ldquo;NTLM problem&amp;rdquo; in the center of our attention.</description>
-    </item>
-    
-    <item>
-      <title>Abusing Kerberos S4U2self for local privilege escalation</title>
-      <link>https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/</link>
-      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/</guid>
-      <description>TL;DR;
-S4U2self can be abused for local privilege escalation (think: Network Service to Local Admin). This is not something new, it&amp;rsquo;s just the first time I actually ran through the steps myself so why not write a post about it. The attack is covered briefly in the Rubeus manual and in more detail in this post by Charlie Clark, which I recommend you read. I won&amp;rsquo;t explain S4U in this post so if you are not familiar with the topic, read this post on constrained delegation first.</description>
     </item>
     
   </channel>

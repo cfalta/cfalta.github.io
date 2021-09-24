@@ -1,7 +1,7 @@
 {
 	"version": 3,
 	"file": "main.css",
-	"sourceRoot": "X:/OneDrive - Falta/crypt/IT/ITStuff/Blog/hugo",
+	"sourceRoot": "C:/Users/ChristophFalta/OneDrive - Falta/sec/blog/hugo",
 	"sources": [
 		"themes/hello-friend-ng/assets/scss/main.scss",
 		"themes/hello-friend-ng/assets/scss/_normalize.scss",

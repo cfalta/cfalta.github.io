@@ -6,10 +6,20 @@
     <description>Recent content in Kerberos on Cyberstoph&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Sat, 26 Jun 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 24 Sep 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://cyberstoph.org/categories/kerberos/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>After the storm - how to move on with NTLM</title>
+      <link>https://cyberstoph.org/posts/2021/09/after-the-storm-how-to-move-on-with-ntlm/</link>
+      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/posts/2021/09/after-the-storm-how-to-move-on-with-ntlm/</guid>
+      <description>I remember that, about 15 years ago, we already flagged the absence of SMB signing as a vulnerability in reports. Though at that time, we circled more around the theoretical risk of someone tampering SMB traffic due to the lack of integrity protection. None of us really had an idea how to make use of that vulnerability. The later obviously changed.
+July 2021 came and brought with it a storm of various Print Spooler RCEs (PrintNightmare), one of the simplest LPE&amp;rsquo;s Windows has seen (HiveNightmare,seriousSAM) and a little hippo (PetitPotam) who anchored the &amp;ldquo;NTLM problem&amp;rdquo; in the center of our attention.</description>
+    </item>
     
     <item>
       <title>Abusing Kerberos S4U2self for local privilege escalation</title>

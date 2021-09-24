@@ -6,7 +6,7 @@
     <description>Recent content in Categories on Cyberstoph&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Sat, 26 Jun 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 24 Sep 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://cyberstoph.org/categories/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,18 +14,54 @@
     <item>
       <title>ActiveDirectory</title>
       <link>https://cyberstoph.org/categories/activedirectory/</link>
-      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://cyberstoph.org/categories/activedirectory/</guid>
       <description></description>
     </item>
     
     <item>
+      <title>BlueTeam</title>
+      <link>https://cyberstoph.org/categories/blueteam/</link>
+      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/blueteam/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Kerberos</title>
       <link>https://cyberstoph.org/categories/kerberos/</link>
-      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://cyberstoph.org/categories/kerberos/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>NTLM</title>
+      <link>https://cyberstoph.org/categories/ntlm/</link>
+      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/ntlm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>PetitPotam</title>
+      <link>https://cyberstoph.org/categories/petitpotam/</link>
+      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/petitpotam/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SpoolSample</title>
+      <link>https://cyberstoph.org/categories/spoolsample/</link>
+      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/spoolsample/</guid>
       <description></description>
     </item>
     
@@ -62,42 +98,6 @@
       <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
       
       <guid>https://cyberstoph.org/categories/redteaming/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>s4u</title>
-      <link>https://cyberstoph.org/categories/s4u/</link>
-      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/s4u/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>.NET</title>
-      <link>https://cyberstoph.org/categories/.net/</link>
-      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/.net/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>C#</title>
-      <link>https://cyberstoph.org/categories/c#/</link>
-      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/c#/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>PowerShell</title>
-      <link>https://cyberstoph.org/categories/powershell/</link>
-      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/powershell/</guid>
       <description></description>
     </item>
     

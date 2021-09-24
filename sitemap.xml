@@ -3,27 +3,57 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/</loc>
-    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+    <loc>https://cyberstoph.org/categories/activedirectory/</loc>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://cyberstoph.org/categories/activedirectory/</loc>
-    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+    <loc>https://cyberstoph.org/posts/2021/09/after-the-storm-how-to-move-on-with-ntlm/</loc>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/blueteam/</loc>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://cyberstoph.org/categories/</loc>
-    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://cyberstoph.org/</loc>
-    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://cyberstoph.org/categories/kerberos/</loc>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/ntlm/</loc>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/petitpotam/</loc>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/posts/</loc>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/categories/spoolsample/</loc>
+    <lastmod>2021-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cyberstoph.org/posts/2021/06/abusing-kerberos-s4u2self-for-local-privilege-escalation/</loc>
     <lastmod>2021-06-26T00:00:00+00:00</lastmod>
   </url>
   
@@ -39,11 +69,6 @@
   
   <url>
     <loc>https://cyberstoph.org/categories/pentest/</loc>
-    <lastmod>2021-06-26T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://cyberstoph.org/posts/</loc>
     <lastmod>2021-06-26T00:00:00+00:00</lastmod>
   </url>
   
