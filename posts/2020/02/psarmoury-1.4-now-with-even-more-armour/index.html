@@ -39,17 +39,10 @@ Introducing BlockDLL process mitigation Thanks to the great C# port of @_RastaMo
 <link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
 <link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
 <meta name="theme-color" content="#252627"><meta itemprop="name" content="PSArmoury 1.4 - now with even more armour">
-<meta itemprop="description" content="PSArmoury 1.4 - Process mitigations, branch selection and more">
-
-
-<meta itemprop="datePublished" content="2020-02-28T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-02-28T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="584">
-
-
-
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary_large_image"/>
+<meta itemprop="description" content="PSArmoury 1.4 - Process mitigations, branch selection and more"><meta itemprop="datePublished" content="2020-02-28T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-02-28T00:00:00+00:00" />
+<meta itemprop="wordCount" content="584"><meta itemprop="image" content="https://cyberstoph.org/"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://cyberstoph.org/"/>
 
 <meta name="twitter:title" content="PSArmoury 1.4 - now with even more armour"/>
@@ -132,45 +125,29 @@ Introducing BlockDLL process mitigation Thanks to the great C# port of @_RastaMo
             
 
             <div class="post-content">
-                
-
-<h2 id="tl-dr">TL;DR;</h2>
-
-<p>I recently added some improvements to <a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">PSArmoury</a>, which I like to share with you in this post</p>
-
+                <h2 id="tldr">TL;DR;</h2>
+<p>I recently added some improvements to <a href="https://github.com/cfalta/PowerShellArmoury">PSArmoury</a>, which I like to share with you in this post</p>
 <ul>
 <li>Support for BlockDLL process mitigation to protect your armoury</li>
 <li>New config parameter that lets you choose the branch in github</li>
 <li>Simple way to create an armoury from a local file</li>
 <li>Automatic inventory function</li>
 </ul>
-
 <p>Still reading? Great, let&rsquo;s go.</p>
-
 <h2 id="introducing-blockdll-process-mitigation">Introducing BlockDLL process mitigation</h2>
-
-<p>Thanks to the great <a href="https://gist.github.com/rasta-mouse/af009f49229c856dc26e3a243db185ec" target="_blank">C# port of @_RastaMouse</a> it was very easy to implement a process mitigation, that was actually meant to protect processes from malicious injections. By setting a special <a href="https://docs.microsoft.com/en-gb/windows/win32/api/winnt/ns-winnt-process_mitigation_binary_signature_policy" target="_blank">flag</a> in the extended startupinfo of a new process, we can prevent any non-microsoft DLL from loading into that process. This can prevent certain EDR solutions from detecting well-known tools inside powershell.</p>
-
+<p>Thanks to the great <a href="https://gist.github.com/rasta-mouse/af009f49229c856dc26e3a243db185ec">C# port of @_RastaMouse</a> it was very easy to implement a process mitigation, that was actually meant to protect processes from malicious injections. By setting a special <a href="https://docs.microsoft.com/en-gb/windows/win32/api/winnt/ns-winnt-process_mitigation_binary_signature_policy">flag</a> in the extended startupinfo of a new process, we can prevent any non-microsoft DLL from loading into that process. This can prevent certain EDR solutions from detecting well-known tools inside powershell.</p>
 <p>To use this with PSArmoury, just create your armoury with the <code>-EnhancedArmour</code> switch like shown below.</p>
-
-<p><img src="https://cyberstoph.org/img/4_blockdll_1.PNG" alt="blockdll1" /></p>
-
+<p><img src="https://cyberstoph.org/img/4_blockdll_1.PNG" alt="blockdll1"></p>
 <p>Note that this will change your user experience a bit. If you try to load an enhanced Armoury it will not decrypt it&rsquo;s content but start a new, protected powershell process and ask you to run it in there manually again. This might seem a bit cumbersome at first but the reasons are simple:</p>
-
 <ul>
 <li>We could also apply the process mitigation policy to the first powershell process we run in (just use Set-ProcessMitigation) but at that point, the process already started and any EDR/AV DLL already runs in that process. Therefore, we need to create a new, clean process.</li>
 <li>There are various ways to automatically run your armoury in the second powershell process, but then again this might raise a red flag itself so I went for the manual approach.</li>
 </ul>
-
 <p>So to use it, just run your armoury as usual and it will guide you through the rest of the process as shown below.</p>
-
-<p><img src="https://cyberstoph.org/img/4_blockdll_2.PNG" alt="blockdll1" /></p>
-
+<p><img src="https://cyberstoph.org/img/4_blockdll_2.PNG" alt="blockdll1"></p>
 <h2 id="choose-github-branch">Choose github branch</h2>
-
 <p>Every item of type &ldquo;GitHubRepo&rdquo; in your configuration file can now contain an attribute called &ldquo;Branch&rdquo;. If it exists, PSArmoury will try to use the branch name supplied in this attribute. If it does not exist, it will use the default branch as before. In the sample config you find on github, we use this attribute to download the dev branch of PowerSploit instead of the master.</p>
-
-<pre><code>    {
+<pre tabindex="0"><code>    {
         &quot;Name&quot;:  &quot;PowerSploit&quot;,
         &quot;Type&quot;:  &quot;GitHubRepo&quot;,
         &quot;URL&quot;:  &quot;https://api.github.com/repos/PowerShellMafia/PowerSploit&quot;,
@@ -178,24 +155,15 @@ Introducing BlockDLL process mitigation Thanks to the great C# port of @_RastaMo
         &quot;FileInclusionFilter&quot;:	&quot;*.ps1&quot;,
         &quot;FileExclusionFilter&quot;:	[&quot;*.tests.ps1&quot;]
     }
-</code></pre>
-
-<h2 id="create-armoury-from-file">Create armoury from file</h2>
-
+</code></pre><h2 id="create-armoury-from-file">Create armoury from file</h2>
 <p>PSArmoury now offers a simple way to create an armoury from a local file. This comes in handy if you just want to quickly protect one (or many) powershell scripts you have on your disk without the need to create a config file.
 Just run PSArmoury with the <code>-FromFile</code> switch and pass it the path to a file or folder containing powershell scripts. You can omit the <code>-Config</code>-switch but note that only files with an extension of <code>*.ps1</code> will be included.</p>
-
-<p><img src="https://cyberstoph.org/img/4_fromfile.PNG" alt="fromfile" /></p>
-
+<p><img src="https://cyberstoph.org/img/4_fromfile.PNG" alt="fromfile"></p>
 <h2 id="inventory">Inventory</h2>
-
 <p>I occassionally find myself in the situation where I don&rsquo;t remember what scripts I put inside an armoury, espescially when it&rsquo;s been some time since I created it. Since everything of relevance is encrypted in the file on disk, it is not so easy to get that information.
 Therefore every armoury now contains an inventory function called <code>Get-PSArmoury</code>, which will print the names of all files included to stdout. This function is built dynamically during creation of the armoury.</p>
-
-<p><img src="https://cyberstoph.org/img/4_inventory.PNG" alt="fromfile" /></p>
-
+<p><img src="https://cyberstoph.org/img/4_inventory.PNG" alt="fromfile"></p>
 <p>That&rsquo;s it for now. If you are using PSArmoury and experience any issues or have ideas for new features, I would be happy to hear from you. Just send me a mail or open an issue on github.</p>
-
 <p>Have a nice weekend!</p>
 
             </div>
@@ -244,7 +212,7 @@ Therefore every armoury now contains an inventory function called <code>Get-PSAr
 
 
 
-<script type="text/javascript" src="https://cyberstoph.org/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
+<script type="text/javascript" src="https://cyberstoph.org/bundle.min.766584e6ea536f54faf86b018d73f719fc520199a6c4d32cbd959eb87634c11b380ac646d80d67304313aac0f5f05e6715221bd99a619bbc905365b55f78147f.js" integrity="sha512-dmWE5upTb1T6&#43;GsBjXP3GfxSAZmmxNMsvZWeuHY0wRs4CsZG2A1nMEMTqsD18F5nFSIb2Zphm7yQU2W1X3gUfw=="></script>
 
 
 

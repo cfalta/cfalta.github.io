@@ -37,17 +37,10 @@
 <link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
 <link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
 <meta name="theme-color" content="#252627"><meta itemprop="name" content="An introduction to Golden Certificates">
-<meta itemprop="description" content="This post introduces a new, ACL-based persistence method in Active Directory">
-
-
-<meta itemprop="datePublished" content="2019-12-07T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2019-12-07T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="1113">
-
-
-
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary_large_image"/>
+<meta itemprop="description" content="This post introduces a new, ACL-based persistence method in Active Directory"><meta itemprop="datePublished" content="2019-12-07T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2019-12-07T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1113"><meta itemprop="image" content="https://cyberstoph.org/"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://cyberstoph.org/"/>
 
 <meta name="twitter:title" content="An introduction to Golden Certificates"/>
@@ -128,118 +121,71 @@
             
 
             <div class="post-content">
-                
-
-<h2 id="tl-dr">TL;DR</h2>
-
-<p>I wrote in <a href="https://cyberstoph.org/posts/2019/11/introducing-poshadcs/" target="_blank">one of my previous posts</a> about how control over a certificate template of any kind can be abused to get a Smartcard certificate for a domain admin. In this post, I want to write a little bit more about the persistence capabilities this approach has to offer, as well as how you can detect it.
+                <h2 id="tldr">TL;DR</h2>
+<p>I wrote in <a href="https://cyberstoph.org/posts/2019/11/introducing-poshadcs/">one of my previous posts</a> about how control over a certificate template of any kind can be abused to get a Smartcard certificate for a domain admin. In this post, I want to write a little bit more about the persistence capabilities this approach has to offer, as well as how you can detect it.
 I call this approach a &ldquo;golden certificate&rdquo; as a tribute to Benjamin Delpys famous &ldquo;golden ticket&rdquo;. The lifetime will not be as long as the one of a golden ticket since certificate lifetime is subject to some boundaries as described below, However it will usually be at least a year - so pretty much time for the attacker anyway.</p>
-
-<p><img src="https://cyberstoph.org/img/3_willywonkacertmeme.jpg" alt="wonka" /></p>
-
-<p>Credits go to the folks at <a href="https://www.sysadmins.lv/blog-en/" target="_blank">sysadmins.lv</a>, which is an excellent source on PKI related stuff and (as always) Will Schroeder for gifting us with <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1" target="_blank">PowerView</a>.</p>
-
+<p><img src="https://cyberstoph.org/img/3_willywonkacertmeme.jpg" alt="wonka"></p>
+<p>Credits go to the folks at <a href="https://www.sysadmins.lv/blog-en/">sysadmins.lv</a>, which is an excellent source on PKI related stuff and (as always) Will Schroeder for gifting us with <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1">PowerView</a>.</p>
 <h2 id="recap">Recap</h2>
-
 <p>Certificate templates are objects in Active Directory that are used as a form of decentralized configuration by Active Directory integrated Certificate Authorities (Active Directory Certificate Services - ADCS). Certificate templates are normally used for a certain purpose (e.g. computer certificates, S/MIME certificates,&hellip;) but that&rsquo;s just how it looks for the Administrator. They are all the same kind of object and if you have write access on the object itself, you can just reconfigure a computer template or any other template to be a smartcard template that accepts arbitrary user names :-). How do we get there?</p>
-
 <h2 id="finding-vulnerable-templates">Finding vulnerable templates</h2>
-
-<p>You can find target accounts with PoshADCS. Just download it from <a href="https://github.com/cfalta/PoshADCS" target="_blank">Github</a> and also don&rsquo;t forget <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1" target="_blank">PowerView</a>, since we rely on that. First import both into your current PowerShell session.</p>
-
-<pre><code>cat -raw PowerView.ps1 | iex
+<p>You can find target accounts with PoshADCS. Just download it from <a href="https://github.com/cfalta/PoshADCS">Github</a> and also don&rsquo;t forget <a href="https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1">PowerView</a>, since we rely on that. First import both into your current PowerShell session.</p>
+<pre tabindex="0"><code>cat -raw PowerView.ps1 | iex
 cat -raw ADCS.ps1 | iex
-</code></pre>
-
-<p>Then run Get-ADCSTemplateACL to query the ACLs of all certificate templates in the current domain. You can use one of the predefined filters to reduce the results since all templates have a couple of default ACEs that allow access for default groups (e.g. Domain Admins).</p>
-
+</code></pre><p>Then run Get-ADCSTemplateACL to query the ACLs of all certificate templates in the current domain. You can use one of the predefined filters to reduce the results since all templates have a couple of default ACEs that allow access for default groups (e.g. Domain Admins).</p>
 <ul>
 <li><strong>-Filter AdminACEs</strong> will remove the ACEs of default administrative groups from the output.</li>
 <li><strong>-Filter DefaultACEs</strong> will remove administrative ACEs like above, but will also hide other default groups (e.g. Domain Computers on a computer template).</li>
 </ul>
-
 <p>This is useful if you are looking for permissions that have been set explicitly in your environment and grant access to custom users or groups.</p>
-
-<pre><code>Get-ADCSTemplateACL -Filter DefaultACEs
-</code></pre>
-
-<p>In our example below, we see that the user &ldquo;John&rdquo; has been granted explicit write permissions on the computer template.</p>
-
-<p><img src="https://cyberstoph.org/img/3_templatewritepermissions.PNG" alt="TemplatePermissions" /></p>
-
+<pre tabindex="0"><code>Get-ADCSTemplateACL -Filter DefaultACEs
+</code></pre><p>In our example below, we see that the user &ldquo;John&rdquo; has been granted explicit write permissions on the computer template.</p>
+<p><img src="https://cyberstoph.org/img/3_templatewritepermissions.PNG" alt="TemplatePermissions"></p>
 <p>If we can get hold of this users credentials, we can use these to get a smartcard certificate for a domain admin or basically any other user you would like to impersonate. The <code>Get-SmartCardCertificate</code> function inside PoshADCS allows us to do just that. But more on that later.</p>
-
 <h2 id="lifetime-of-a-golden-certificate">Lifetime of a Golden Certificate</h2>
-
 <p>The maximum certificate lifetime will be the shortest of the following:</p>
-
 <ul>
-<li><p>the validity time configured in the certificate template.</p></li>
-
-<li><p>the remaining validity period of the signing CA certificate. Simply put, a certificate issued by a CA cannot be valid longer than the CA certificate itself.</p></li>
-
-<li><p>the timerange defined in the CA configuration file (CAPolicy.inf) during installation. If not defined, this is the default value of 2 years, which means that if the CA is deployed with all default values, the Golden Certificate can usually not last longer than 2 years maximum. You can check the CA configuration using certutil on the CA server.</p>
-
-<pre><code>certutil -getreg CA\ValidityPeriod
-certutil -getreg CA\ValidityPeriodUnits
-</code></pre></li>
+<li>
+<p>the validity time configured in the certificate template.</p>
+</li>
+<li>
+<p>the remaining validity period of the signing CA certificate. Simply put, a certificate issued by a CA cannot be valid longer than the CA certificate itself.</p>
+</li>
+<li>
+<p>the timerange defined in the CA configuration file (CAPolicy.inf) during installation. If not defined, this is the default value of 2 years, which means that if the CA is deployed with all default values, the Golden Certificate can usually not last longer than 2 years maximum. You can check the CA configuration using certutil on the CA server.</p>
+</li>
 </ul>
-
-<h2 id="getting-a-golden-certificate">Getting a Golden Certificate</h2>
-
-<pre><code>man Get-SmartcardCertificate
-</code></pre>
-
-<p><img src="https://cyberstoph.org/img/3_manGetSmartcardCertificate.JPG" alt="Parameters" /></p>
-
+<pre tabindex="0"><code>certutil -getreg CA\ValidityPeriod
+certutil -getreg CA\ValidityPeriodUnits
+</code></pre><h2 id="getting-a-golden-certificate">Getting a Golden Certificate</h2>
+<pre tabindex="0"><code>man Get-SmartcardCertificate
+</code></pre><p><img src="https://cyberstoph.org/img/3_manGetSmartcardCertificate.JPG" alt="Parameters"></p>
 <ul>
 <li><strong>Identity</strong> is the samAccountName of the target user</li>
 <li><strong>TemplateName</strong> is the CN of the template we will abuse (= the one you have write permissions on)</li>
 <li><strong>NoSmartCard</strong> instructs the script not to use the Smartcard CSP and make the certificate exportable. The resulting certificate will be stored in the normal user certificate store. This is useful if you have no ability to get a Smartcard on the host you request the certificate on. Just export it from the store and import it back on a smartcard on a host you control. It&rsquo;s also useful if you just want to prove that the attack would succeed without messing around with Smartcards.</li>
 </ul>
-
 <p>We will run Get-SmartcardCertificate mit the <code>NoSmartCard</code> switch to get an exportable certificate for the user &ldquo;Chuck Norris&rdquo; (who obviously is a domain admin).</p>
-
-<pre><code>Get-SmartcardCertificate -Identity norris -Template CorpComputer -NoSmartcard
-</code></pre>
-
-<p><img src="https://cyberstoph.org/img/3_getcertfordomadm.PNG" alt="POC" /></p>
-
+<pre tabindex="0"><code>Get-SmartcardCertificate -Identity norris -Template CorpComputer -NoSmartcard
+</code></pre><p><img src="https://cyberstoph.org/img/3_getcertfordomadm.PNG" alt="POC"></p>
 <h2 id="defending-against-golden-certificates">Defending against Golden Certificates</h2>
-
 <p>Like Golden Tickets, you can&rsquo;t really prevent these things once an attacker has the appropriate permissions to do so. But you can detect and respond as soon as it happens.</p>
-
 <ul>
 <li>First, be aware that your CA Admins (or any other user who can change a certificate template) are equivilant to Domain Admins. Therefore monitor and protect these accounts as you do with your Domain Admins.</li>
 <li>Second, you should monitor issued certificates and changes to certificate templates closely.</li>
 </ul>
-
-<p>I will sum up quickly how to configure auditing on the CA but you should definitely have a look at Microsofts <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn786432(v%3Dws.11)" target="_blank">PKI Monitoring Guide</a> for more details.</p>
-
+<p>I will sum up quickly how to configure auditing on the CA but you should definitely have a look at Microsofts <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn786432(v%3Dws.11)">PKI Monitoring Guide</a> for more details.</p>
 <p>We start with enabling success/failure logging for &ldquo;Object Access\Audit Certificate Services&rdquo;. You can do this with group policy (Configuration\Windows Settings\Security Settings\Advanced Audit Policy) or locally by running</p>
-
-<pre><code>auditpol /set /subcategory:&quot;Certification Services&quot; /success:enable /failure:enable
-</code></pre>
-
-<p>After that you need to enable auditing in the &ldquo;Auditing&rdquo; tab of your CA. I would recommend to enable all categories but you need at least &ldquo;Change CA configuration&rdquo; and &ldquo;Issue and manage certificate requests&rdquo; to detect this attack.</p>
-
-<p><img src="https://cyberstoph.org/img/3_ca_auditing_properties.png" alt="CA Audit config" /></p>
-
+<pre tabindex="0"><code>auditpol /set /subcategory:&quot;Certification Services&quot; /success:enable /failure:enable
+</code></pre><p>After that you need to enable auditing in the &ldquo;Auditing&rdquo; tab of your CA. I would recommend to enable all categories but you need at least &ldquo;Change CA configuration&rdquo; and &ldquo;Issue and manage certificate requests&rdquo; to detect this attack.</p>
+<p><img src="https://cyberstoph.org/img/3_ca_auditing_properties.png" alt="CA Audit config"></p>
 <p>In addition, you have to run the following certutil command to activate logging of template changes.</p>
-
-<pre><code>certutil –setreg policy\EditFlags +EDITF_AUDITCERTTEMPLATELOAD
-</code></pre>
-
-<p>Now that everything is set, you should find events of the task category <code>Certification Services</code> trickling into the default Security log of your CA. Rebooting the CA server once might speed this process up if you are missing events.</p>
-
+<pre tabindex="0"><code>certutil –setreg policy\EditFlags +EDITF_AUDITCERTTEMPLATELOAD
+</code></pre><p>Now that everything is set, you should find events of the task category <code>Certification Services</code> trickling into the default Security log of your CA. Rebooting the CA server once might speed this process up if you are missing events.</p>
 <p>The event most interesting for us is <code>A Certificate Services template was updated (4899)</code>. 4899 will be logged when a certificate template changes and contains the old as well as the new configuration. You can use this to match template updates where the new configuration contains a <code>pKIExtendedKeyUsage</code> attribute that matches the string <code>1.3.6.1.4.1.311.20.2.2 Smart Card Logon</code>.</p>
-
-<p><img src="https://cyberstoph.org/img/3_event4899_1.PNG" alt="4899" /></p>
-
+<p><img src="https://cyberstoph.org/img/3_event4899_1.PNG" alt="4899"></p>
 <p>We will also find a <code>Certificate Services approved a certificate request and issued a certificate (4887)</code> for our Golden Certificate, however this event unfortunately does not hold much information for us. You can see in the screenshot below that we do not find the identity to whom the certificate was issued in the event nor the certificate template it refers to :-( :-( :-(. Therefore we cant use this event to alert on but it is still useful from a forensics perspective.</p>
-
-<p><img src="https://cyberstoph.org/img/3_event4887_1.PNG" alt="4887" /></p>
-
+<p><img src="https://cyberstoph.org/img/3_event4887_1.PNG" alt="4887"></p>
 <p>That&rsquo;s it for now. Give it a try and let me know what you think!</p>
 
             </div>
@@ -288,7 +234,7 @@ certutil -getreg CA\ValidityPeriodUnits
 
 
 
-<script type="text/javascript" src="https://cyberstoph.org/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
+<script type="text/javascript" src="https://cyberstoph.org/bundle.min.766584e6ea536f54faf86b018d73f719fc520199a6c4d32cbd959eb87634c11b380ac646d80d67304313aac0f5f05e6715221bd99a619bbc905365b55f78147f.js" integrity="sha512-dmWE5upTb1T6&#43;GsBjXP3GfxSAZmmxNMsvZWeuHY0wRs4CsZG2A1nMEMTqsD18F5nFSIb2Zphm7yQU2W1X3gUfw=="></script>
 
 
 
