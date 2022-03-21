@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author"
+    content="map[name:Christoph Falta]">
+<meta name="description"
+    content="A defenders perspective on msDS-KeyCredentialLink
+TL;DR;
+This article is about my journey into tracing changes to the msDS-KeyCredentialLink attribute to verify if their origin is legitimate or a potential attack (aka. Shadow Credentials). If you just want to know the &amp;ldquo;gist&amp;rdquo; of it, scroll down to the bottom and you&amp;rsquo;ll find a mindmap.
+What&amp;rsquo;s msDS-KeyCredentialLink and why should I care? The msDS-KeyCredentialLink (aka. &amp;ldquo;kcl&amp;rdquo;) attribute can be used to link an RSA key pair with a computer or user object in order to authenticate with said key pair against the KDC to receive a Kerberos TGT." />
+<meta name="keywords" content="it-security,information security,infosec,it,engineering,isec,blog,informatics,development,programming" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://cyberstoph.org/posts/2022/03/detecting-shadow-credentials/" />
+
+
+<title>
+    
+    Detecting shadow credentials :: Cyberstoph&#39;s blog  — Cyberstoph&#39;s Blog
+    
+</title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="https://cyberstoph.org/main.min.50732f89be4725d13ca6bfcdb1222c13b176cb0f7f6f721eb384c09d5423300a.css">
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://cyberstoph.org/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://cyberstoph.org/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://cyberstoph.org/favicon-16x16.png">
+<link rel="manifest" href="https://cyberstoph.org/site.webmanifest">
+<link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
+<link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
+<meta name="theme-color" content="#252627"><meta itemprop="name" content="Detecting shadow credentials">
+<meta itemprop="description" content="Detecting shadow credentials">
+
+
+<meta itemprop="datePublished" content="2022-03-21T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2022-03-21T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2047">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://cyberstoph.org/"/>
+
+<meta name="twitter:title" content="Detecting shadow credentials"/>
+<meta name="twitter:description" content="Detecting shadow credentials"/>
+
+
+
+<meta property="article:section" content="Kerberos" />
+<meta property="article:section" content="ActiveDirectory" />
+<meta property="article:section" content="msDS-KeyCredentialLink" />
+<meta property="article:section" content="WHFB" />
+<meta property="article:section" content="BlueTeam" />
+<meta property="article:section" content="SOC" />
+<meta property="article:section" content="Security" />
+<meta property="article:section" content="Azure" />
+<meta property="article:section" content="AzureAD" />
+
+<meta property="article:published_time" content="2022-03-21 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+    </head>
+
+    <body class="dark-theme">
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://cyberstoph.org/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">PS #&gt; </span>
+            <span class="logo__cursor"></span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://cyberstoph.org/about/">About</a></li><li><a href="https://cyberstoph.org/posts/">Posts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+
+            <span class="theme-toggle unselectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+</svg>
+</span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="https://cyberstoph.org/posts/2022/03/detecting-shadow-credentials/">Detecting shadow credentials</a></h2>
+
+            
+
+            <div class="post-content">
+                
+
+<p><em>A defenders perspective on msDS-KeyCredentialLink</em></p>
+
+<p><strong>TL;DR;</strong></p>
+
+<p>This article is about my journey into tracing changes to the msDS-KeyCredentialLink attribute to verify if their origin is legitimate or a potential attack (aka. Shadow Credentials). If you just want to know the &ldquo;gist&rdquo; of it, scroll down to the bottom and you&rsquo;ll find a mindmap.</p>
+
+<h2 id="what-s-msds-keycredentiallink-and-why-should-i-care">What&rsquo;s msDS-KeyCredentialLink and why should I care?</h2>
+
+<p>The msDS-KeyCredentialLink (aka. &ldquo;kcl&rdquo;) attribute can be used to link an RSA key pair with a computer or user object in order to authenticate with said key pair against the KDC to receive a Kerberos TGT. So the kcl is in fact a set of alternate credentials that works alongside username/password. An excellent source of information around msDS-KeyCredentialLink is <a href="https://www.dsinternals.com/wp-content/uploads/eu-19-Grafnetter-Exploiting-Windows-Hello-for-Business.pdf" target="_blank">Michael Grafnetters talk at Black Hat 2019</a> and his famous powershell module <a href="https://github.com/MichaelGrafnetter/DSInternals" target="_blank">DSInternals</a>. I highly recommend you watch his talk since he also explains the relationship between msDS-KeyCredentialLink and Windows Hello for Business (WHfB).</p>
+
+<p>Fast forward a couple of years, manipulating kcl has become a well-known attack technique known as &ldquo;Shadow Credentials&rdquo; and I especially recommend <a href="https://posts.specterops.io/shadow-credentials-abusing-key-trust-account-mapping-for-takeover-8ee1a53566ab" target="_blank">this article by Elad Shamir</a> and <a href="https://www.thehacker.recipes/ad/movement/kerberos/shadow-credentials" target="_blank">this documentation by Charlie Bromberg</a> for further details, if you are not familiar with the topic.
+In a nutshell: if an attacker can write the kcl of an account, he/she will be able to impersonate that account either to gain access or for persistence. Write access to the kcl could be achieved through ACL-misconfigurations, control over another, high-privilged account or through relaying (NTLM) authentication. The NTLM-relay-scenario was in fact the one that made me look into this matter for a couple of reasons:</p>
+
+<ul>
+<li>It is available in a default setup if we focus on computer accounts. Microsoft closed PetitPotam but there are still other authentication triggers available like <a href="https://github.com/leechristensen/SpoolSample" target="_blank">good old spool sample</a> and also LDAP Signing is not enforced by default.</li>
+<li>Tooling is publicly available. You can use the above mentioned original POC for coercing authentication or choose one of <a href="https://github.com/cube0x0/SharpSystemTriggers" target="_blank">these triggers</a>. Charlie Bromberg also pushed a <a href="https://github.com/SecureAuthCorp/impacket/pull/1249" target="_blank">customized version of ntlmrelayx</a> which supports shadow credentials.</li>
+<li>And finally: it is not easy to reliably detect and that&rsquo;s what this whole post is about.</li>
+</ul>
+
+<h2 id="auditing-msds-keycredentiallink">Auditing msDS-KeyCredentialLink</h2>
+
+<p>Manipulation of this attribute can be traced through the common &ldquo;Audit Directory Service Changes&rdquo; subcategory, resulting in an event <code>5136: A directory service object was modified</code>. Have a look at <a href="https://www.elastic.co/guide/en/security/7.17/prebuilt-rule-0-16-1-potential-shadow-credentials-added-to-ad-object.html" target="_blank">this post</a> by elastic on how to enable auditing and don&rsquo;t forget to set an appropriate SACL for user and computer objects.</p>
+
+<p>Here&rsquo;s how such a malicious event looks like. The <code>Subject</code> refers to the actor and the <code>Object</code> is the account that was modified.</p>
+
+<pre><code>A directory service object was modified.
+	
+Subject:
+	Security ID:		NETCORP\evil
+	Account Name:		evil
+	Account Domain:	NETCORP
+	Logon ID:		0xBCDAC
+
+Directory Service:
+	Name:	netcorp.at
+	Type:	Active Directory Domain Services
+	
+Object:
+	DN:	CN=pc1,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	GUID:	CN=pc1,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	Class:	computer
+	
+Attribute:
+	LDAP Display Name:	msDS-KeyCredentialLink
+	Syntax (OID):	2.5.5.7
+	Value:	B:828:&lt;Binary&gt;:CN=adlab-01,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	
+Operation:
+	Type:	Value Added
+	Correlation ID:	{5bff0e70-432c-4ae9-9081-06675dba7869}
+	Application Correlation ID:	-
+</code></pre>
+
+<p>Now that we&rsquo;ve started collecting these events, we have to find ways to verify the legitimazy of a single event. For example, the subject and object are different in the above event, but is this always a useful indicator? It turns out the answer highly depends on your individual environment and varies if you refer to computer or user objects. Therefore, it&rsquo;s necessary to identify legitimate use-cases which invoke the modification of the kcl attribute. I will describe the two scenarios that seem the most commont to me in the following sections, however this is not a complete list. As Michael Grafnetter showed in his talk, there might be more (undocumented) use-cases.</p>
+
+<p><img src="https://cyberstoph.org/img/9_whfb_grafnetter_1.png" alt="kclusage" /></p>
+
+<h2 id="use-case-1-whfb-hybrid-azure-ad-joined-key-trust">Use-case 1 - WHfB Hybrid Azure AD Joined Key Trust</h2>
+
+<p>If you search for information about kcl on the internet, you&rsquo;ll end up reading a lot about Windows Hello for Business (WHfB). There is a wealth of <a href="https://docs.microsoft.com/en-us/windows/security/identity-protection/hello-for-business/hello-how-it-works-provisioning" target="_blank">really good documentation</a> about WHfB available, which explains the details far more better than I ever could (including the talk by Michael Grafnetter mentioned earlier), so I won&rsquo;t cover it in this post.</p>
+
+<p>The short story is: during WHfB enrollment, the user will generate a key pair and link the public key to the users object in AAD. During the next sync cycle, Azure AD Connect will sync this public key into the msDS-KeyCredentialLink attribute of the user object in on-prem AD, alongside a couple of other information. Note that this refers to a hybrid AAD join environment with WHfB enabled.</p>
+
+<p>A modification event generated in such a scenario looks like this:</p>
+
+<pre><code>A directory service object was modified.
+	
+Subject:
+	Security ID:		netcorp\MSOL_8bee7c7b05af
+	Account Name:		MSOL_8bee7c7b05af
+	Account Domain:	netcorp
+	Logon ID:		0xAFEC9F
+
+Directory Service:
+	Name:	netcorp.at
+	Type:	Active Directory Domain Services
+	
+Object:
+	DN:	CN=whfbuser,OU=WHFB,OU=DomainUser,OU=User,OU=company,DC=netcorp,DC=at
+	GUID:	CN=whfbuser,OU=WHFB,OU=DomainUser,OU=User,OU=company,DC=netcorp,DC=at
+	Class:	user
+	
+Attribute:
+	LDAP Display Name:	msDS-KeyCredentialLink
+	Syntax (OID):	2.5.5.7
+	Value:	B:854:&lt;Binary&gt;:CN=whfbuser,OU=WHFB,OU=DomainUser,OU=User,OU=company,DC=netcorp,DC=at
+	
+Operation:
+	Type:	Value Added
+	Correlation ID:	{10148d86-8374-4197-84d6-586a201dfa4b}
+	Application Correlation ID:	-
+</code></pre>
+
+<p>If you see an event like this in an environment without WHfB or even hybrid AAD join, then this is obviously a red flag. So for the following detection and verification workflow, we&rsquo;ll asume that we live in such an environment and want to make sure that it is in fact a legitimate event.</p>
+
+<p>Let&rsquo;s try to go through the information we have. Focusing on the event data above, we see that subject/actor is the AAD Connect sync account. Usually, this should be the only account that modifies this attribute. Also, note that the object class is <code>user</code>. If a user enrolls for WHfB, the key is written to the user object and not to the computer object on which the user went through the enrollment.
+The event also contains a Logon ID, which is a unique identifier to link the modification event 5136 to a logon event 4624. Here&rsquo;s the corresponding example.</p>
+
+<pre><code>An account was successfully logged on.
+
+Subject:
+	Security ID:		NULL SID
+	Account Name:		-
+	Account Domain:		-
+	Logon ID:		0x0
+
+Logon Information:
+	Logon Type:		3
+	Restricted Admin Mode:	-
+	Virtual Account:		No
+	Elevated Token:		Yes
+
+Impersonation Level:		Impersonation
+
+New Logon:
+	Security ID:		netcorp\MSOL_8bee7c7b05af
+	Account Name:		MSOL_8bee7c7b05af
+	Account Domain:		NETCORP.AT
+	Logon ID:		0xAFEC9F
+	Linked Logon ID:		0x0
+	Network Account Name:	-
+	Network Account Domain:	-
+	Logon GUID:		{a095cd77-3ac7-c998-61d3-9995308dc76d}
+
+Process Information:
+	Process ID:		0x0
+	Process Name:		-
+
+Network Information:
+	Workstation Name:	-
+	Source Network Address:	fe80::2d5f:1c5a:ede5:89c8
+	Source Port:		54856
+
+Detailed Authentication Information:
+	Logon Process:		Kerberos
+	Authentication Package:	Kerberos
+	Transited Services:	-
+	Package Name (NTLM only):	-
+	Key Length:		0
+</code></pre>
+
+<p>Keep an eye on the source network address in that event. This allows you to verify if the authentication actually came from the server running AAD Connect, which already gives you three indicators to verify:</p>
+
+<ul>
+<li>Is the subject the AAD Connect sync service account?</li>
+<li>Is the object class &ldquo;user&rdquo;?</li>
+<li>Is the corresponding authentication originating from the correct server?</li>
+</ul>
+
+<p>If you answer all three questions with &ldquo;yes&rdquo;, then that&rsquo;s already a strong argument I&rsquo;d say but we can go further. Let&rsquo;s have a look at the kcl attribute in AD using DSInternals.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">Get-ADUser -Identity whfbuser -Properties * | select -expand msds-keycredentiallink | Get-ADKeyCredential</code></pre></div>
+<p><img src="https://cyberstoph.org/img/9_whfb_kcl_1.png" alt="kclcontent" /></p>
+
+<p>The user &ldquo;whfbuser&rdquo; got two credentials registered. Each credential is associated with a device ID, which maps to the device ID attribute of the computer object in AAD. At the time of this writing, public attack tools like <a href="https://github.com/eladshamir/Whisker" target="_blank">Whisker</a> just generate a random GUID since there is no real device to assoicate with. That&rsquo;s something we can check from a defensive point of view, using AzureAD powershell.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">Get-AzureADDevice | ? {$_.deviceid <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;&lt;device-id&gt;&#34;</span>}</code></pre></div>
+<p><img src="https://cyberstoph.org/img/9_whfb_kcl_2.png" alt="kclcontent" /></p>
+
+<p>We can see that both credentials map to an existing device and we could now use information from a third-party database like a CMDB to check if these devices truely belong to the user. Again, this is not bulletproof depending on the access the attacker already has but still not that bad.
+As a final verification step, we could reach out to the client to grab the generated public key and verify if this is really the same public key stored in the kcl attribute. Stephan Waelde describes how to follow a key from the device to Azure AD and back to on-prem AD in <a href="https://stephanwaelde.com/2020/02/24/azure-ad-join-single-sign-on-follow-the-key/" target="_blank">his blog post</a>, so I&rsquo;ll refer you to his guide.</p>
+
+<p>Finally, we can put everything we&rsquo;ve learned up until now in a nice mindmap.</p>
+
+<p><img src="https://cyberstoph.org/img/9_whfb_mindmap.png" alt="whfb-chart" /></p>
+
+<h2 id="use-case-2-credential-guard">Use-case 2 - Credential Guard</h2>
+
+<p>Usage of Credential Guard is one of the lesser known (at least as far as I know) triggers for kcl population. It is just briefly mentioned in <a href="https://docs.microsoft.com/en-us/windows-server/security/kerberos/domain-joined-device-public-key-authentication" target="_blank">this article</a> from Microsoft docs.</p>
+
+<p><img src="https://cyberstoph.org/img/9_credguard_kcl_1.png" alt="credguard1" /></p>
+
+<p>The corresponding event 5136 for this action looks like this.</p>
+
+<pre><code>A directory service object was modified.
+	
+Subject:
+	Security ID:		NETCORP\PC1$
+	Account Name:		PC1$
+	Account Domain:		NETCORP
+	Logon ID:		0xA170D
+
+Directory Service:
+	Name:	netcorp.at
+	Type:	Active Directory Domain Services
+	
+Object:
+	DN:	CN=pc1,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	GUID:	CN=pc1,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	Class:	computer
+	
+Attribute:
+	LDAP Display Name:	msDS-KeyCredentialLink
+	Syntax (OID):	2.5.5.7
+	Value:	B:754:&lt;Binary&gt;:CN=pc1,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	
+Operation:
+	Type:	Value Added
+	Correlation ID:	{cb1839a0-32c4-4843-bf57-a5b5308dbd73}
+	Application Correlation ID:	-
+</code></pre>
+
+<p>You can see that the subject and the object are the same, which makes it harder for us to draw a useful conclusion just from the event data. This becomes a bigger problem if we think about a malicious change that was introduced through NTLM-relay, as mentioned in the beginning.
+Here&rsquo;s how this event looks after an NTLM-relay attack using ntlmrelayx.</p>
+
+<pre><code>A directory service object was modified.
+	
+Subject:
+	Security ID:		netcorp\PC1$
+	Account Name:		PC1$
+	Account Domain:		netcorp
+	Logon ID:		0x125BAF
+
+Directory Service:
+	Name:	netcorp.at
+	Type:	Active Directory Domain Services
+	
+Object:
+	DN:	CN=pc1,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	GUID:	CN=pc1,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	Class:	computer
+	
+Attribute:
+	LDAP Display Name:	msDS-KeyCredentialLink
+	Syntax (OID):	2.5.5.7
+	Value:	B:828:&lt;Binary&gt;:CN=pc1,OU=Client,OU=Computer,OU=company,DC=netcorp,DC=at
+	
+Operation:
+	Type:	Value Added
+	Correlation ID:	{971bae70-6821-4b8c-bdbf-dbb14101b21c}
+	Application Correlation ID:	-
+</code></pre>
+
+<p>You don&rsquo;t see much difference? Me neither. You could go for the corresponding event 4624 again and check IP addresses but this is usually a less reliable source of information for clients and would also imply that you have things like DHCP logs. So let&rsquo;s have a look at msDS-KeyCredentialLink itself again. Note, that we&rsquo;re analysing the legitimate credential and not the one added by ntlmrelayx.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">Get-ADComputer -Identity pc1 -Properties * | select -expand msds-keycredentiallink | Get-ADKeyCredential</code></pre></div>
+<p><img src="https://cyberstoph.org/img/9_credguard_kcl_2.png" alt="kclcontent" /></p>
+
+<p>If you compare this key-credential with the one from the previous use-case, you can see two of differences.</p>
+
+<ul>
+<li>The key source is <strong>AD</strong> instead of <strong>AzureAD</strong>.</li>
+<li>There is no device ID since the key is already stored in the kcl of a device so that wouldn&rsquo;t make sense.</li>
+</ul>
+
+<p>Remember that tools like whisker and also ntlmrelayx automatically set a device ID by default, so they mimic the WHfB use-case discussed previously but actually raise a red-flag when it comes to the credentialguard use-case. That&rsquo;s good for starters, however you could obviously change the tools without much effort and then we&rsquo;re back at the beginning.</p>
+
+<p>So why don&rsquo;t we compare the key on the device with the key in AD? It turns out, that the location and the structure of this key is not publicly documented by Microsoft. However, there&rsquo;s one man who already got us covered and it shouldn&rsquo;t be a surprise ;)</p>
+
+<p><img src="https://cyberstoph.org/img/9_credguard_kcl_3.png" alt="kcl-mimikatz" /></p>
+
+<p>Microsoft calls the structure this key is stored in a &ldquo;machine-bound certificate&rdquo; and Benjamin Delpy not only knows <a href="https://github.com/gentilkiwi/mimikatz/blob/e10bde5b16b747dc09ca5146f93f2beaf74dd17a/mimikatz/modules/kuhl_m_lsadump.c" target="_blank">where to find it</a> but also how to extract it. Nice.
+Unfortunately, defenders can&rsquo;t usually just go around and randomly execute Mimikatz for various reasons, so I chose a less elegant way to &ldquo;reimplement&rdquo; the functionality. <a href="https://gist.github.com/cfalta/ad6a19656c84752b409c3d6e5fc9d0a2" target="_blank">This script</a> uses PSRemoting to grab the content of the <code>machineboundcertificate</code> registry value of the host and runs a byte-wise comparison with the content of the public key from the kcl attribute in AD (very quick and dirty - I know ^^).</p>
+
+<p>Here&rsquo;s how the output of this script looks like.</p>
+
+<p><img src="https://cyberstoph.org/img/9_credguard_kcl_4.png" alt="kcl-compare" /></p>
+
+<p>A very opsec-concerned attacker could still work around this by also setting the content of the registry value correctly, but I think it&rsquo;s still an indicator worth looking at. Finally, it&rsquo;s mindmap time again.</p>
+
+<p><img src="https://cyberstoph.org/img/9_credguard_mindmap.png" alt="whfb-chart" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Auditing msDS-KeyCredentialLink changes is easy, verifying a change is not and heavily depends on a solid knowledge of what&rsquo;s &ldquo;normal&rdquo; in your environment. I hope this post allows you to save some time during the process. It took me quite a bit to get this sorted out so far, but I still have the strong feeling that I&rsquo;m missing something (or a lot). So if you read this and know more than I do, I&rsquo;d happy if you could let me know.
+That said, here&rsquo;s another mindmap because #MindMapsAreFun :)</p>
+
+<p><img src="https://cyberstoph.org/img/9_final_mindmap.png" alt="finalmindmap" /></p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+  			</div>
+
+        
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2022</span>
+            
+                <span><a href="https://cyberstoph.org/">Christoph Falta</a></span>
+            
+            <span>Copyright <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            <span> <a href="https://cyberstoph.org/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
+        </div>
+    </div>
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+
+<script type="text/javascript" src="https://cyberstoph.org/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
+
+
+
+    </body>
+</html>

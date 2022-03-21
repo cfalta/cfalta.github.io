@@ -6,7 +6,23 @@
     <description>Recent content on Cyberstoph&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Fri, 24 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cyberstoph.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 21 Mar 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://cyberstoph.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Detecting shadow credentials</title>
+      <link>https://cyberstoph.org/posts/2022/03/detecting-shadow-credentials/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/posts/2022/03/detecting-shadow-credentials/</guid>
+      <description>A defenders perspective on msDS-KeyCredentialLink
+TL;DR;
+This article is about my journey into tracing changes to the msDS-KeyCredentialLink attribute to verify if their origin is legitimate or a potential attack (aka. Shadow Credentials). If you just want to know the &amp;ldquo;gist&amp;rdquo; of it, scroll down to the bottom and you&amp;rsquo;ll find a mindmap.
+What&amp;rsquo;s msDS-KeyCredentialLink and why should I care? The msDS-KeyCredentialLink (aka. &amp;ldquo;kcl&amp;rdquo;) attribute can be used to link an RSA key pair with a computer or user object in order to authenticate with said key pair against the KDC to receive a Kerberos TGT.</description>
+    </item>
+    
     <item>
       <title>After the storm - how to move on with NTLM</title>
       <link>https://cyberstoph.org/posts/2021/09/after-the-storm-how-to-move-on-with-ntlm/</link>
@@ -96,16 +112,6 @@ PSArmoury I wrote my &amp;ldquo;Powershell Armoury&amp;rdquo; script a while ago
       <description>Hello World! Yet another blog unravels in the depths of the internet. Let&amp;rsquo;s see if anyone will find it at all :-)
 If you however do so, you&amp;rsquo;ll probably read a lot about Windows security, Powershell, AD, privesc and general infosec stuff.
 Hope you like it stranger!</description>
-    </item>
-    
-    <item>
-      <title>About</title>
-      <link>https://cyberstoph.org/about/</link>
-      <pubDate>Sun, 20 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/about/</guid>
-      <description>My name is Christoph, I am one of the many security guys with a blog hiding in the depths of the internet. I work as a security analyst and my main focus is Windows security and anything that&amp;rsquo;s related to that lovely beast from redmond. so you will probably read a lot about AD, Powershell and things alike. Let me know what you think :-)
-You can reach me on Twitter or via EMail</description>
     </item>
     
   </channel>

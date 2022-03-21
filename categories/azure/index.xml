@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Azure on Cyberstoph&#39;s blog</title>
+    <link>https://cyberstoph.org/categories/azure/</link>
+    <description>Recent content in Azure on Cyberstoph&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Mon, 21 Mar 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://cyberstoph.org/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Detecting shadow credentials</title>
+      <link>https://cyberstoph.org/posts/2022/03/detecting-shadow-credentials/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/posts/2022/03/detecting-shadow-credentials/</guid>
+      <description>A defenders perspective on msDS-KeyCredentialLink
+TL;DR;
+This article is about my journey into tracing changes to the msDS-KeyCredentialLink attribute to verify if their origin is legitimate or a potential attack (aka. Shadow Credentials). If you just want to know the &amp;ldquo;gist&amp;rdquo; of it, scroll down to the bottom and you&amp;rsquo;ll find a mindmap.
+What&amp;rsquo;s msDS-KeyCredentialLink and why should I care? The msDS-KeyCredentialLink (aka. &amp;ldquo;kcl&amp;rdquo;) attribute can be used to link an RSA key pair with a computer or user object in order to authenticate with said key pair against the KDC to receive a Kerberos TGT.</description>
+    </item>
+    
+  </channel>
+</rss>

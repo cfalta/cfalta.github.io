@@ -38,10 +38,17 @@ From exe to ps1 If you read one of my previous posts, you might already know tha
 <link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
 <link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
 <meta name="theme-color" content="#252627"><meta itemprop="name" content="ConvertTo-Powershell - wrapping applications with PS">
-<meta itemprop="description" content="ConvertTo-Powershell - wrapping applications with PS"><meta itemprop="datePublished" content="2020-09-06T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2020-09-06T00:00:00+00:00" />
-<meta itemprop="wordCount" content="790"><meta itemprop="image" content="https://cyberstoph.org/"/>
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary_large_image"/>
+<meta itemprop="description" content="ConvertTo-Powershell - wrapping applications with PS">
+
+
+<meta itemprop="datePublished" content="2020-09-06T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-09-06T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="790">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://cyberstoph.org/"/>
 
 <meta name="twitter:title" content="ConvertTo-Powershell - wrapping applications with PS"/>
@@ -124,35 +131,64 @@ From exe to ps1 If you read one of my previous posts, you might already know tha
             
 
             <div class="post-content">
-                <h2 id="tldr">TL;DR;</h2>
-<p>The newest addition to PSArmoury is a small utility script called <a href="https://github.com/cfalta/PowerShellArmoury/blob/master/ConvertTo-Powershell.ps1">ConvertTo-Powershell</a>. It allows to &ldquo;convert&rdquo; a C# console application into a powershell script or in other words it creates a .ps1 file from a .exe file.
+                
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p>The newest addition to PSArmoury is a small utility script called <a href="https://github.com/cfalta/PowerShellArmoury/blob/master/ConvertTo-Powershell.ps1" target="_blank">ConvertTo-Powershell</a>. It allows to &ldquo;convert&rdquo; a C# console application into a powershell script or in other words it creates a .ps1 file from a .exe file.
 This can be useful for bypassing AWL or AV software and if you are a similar PS-lunatic like myself, it&rsquo;s also just fun :-)</p>
+
 <h2 id="from-exe-to-ps1">From exe to ps1</h2>
+
 <p>If you read one of my previous posts, you might already know that I prefer to do stuff in Powershell. One of my pet projects is the PowerShellArmoury, which allows you to store other PowerShell code in a single, encrypted .ps1-file called a &ldquo;loader&rdquo;. The loader, when invoked, tries to bypass the Windows Anti-Malware-Scan-Interface (AMSI) and then decrypts and loads the original Powershell code in the current session.</p>
-<p>That works pretty well for Powershell but since pure .NET is the popular kid in town right now, more and more fancy tools are written in C# and no longer in PS. Therefore, I was looking for a way to integrate things like <a href="https://github.com/GhostPack/">Ghostpack</a> into my existing armoury and found the solution pretty much at the end of the <a href="https://github.com/GhostPack/Rubeus#sidenote-running-rubeus-through-powershell">Rubeus wiki</a>.</p>
-<pre tabindex="0"><code>$RubeusAssembly = [System.Reflection.Assembly]::Load([Convert]::FromBase64String(&quot;aa...&quot;))
-</code></pre><p>The command above uses the <code>System.Reflection</code> namespace to load a compiled C# console application into your active Powershell session. You can then execute the methods within directly from Powershell. Pretty cool I&rsquo;d say but how does it work?</p>
+
+<p>That works pretty well for Powershell but since pure .NET is the popular kid in town right now, more and more fancy tools are written in C# and no longer in PS. Therefore, I was looking for a way to integrate things like <a href="https://github.com/GhostPack/" target="_blank">Ghostpack</a> into my existing armoury and found the solution pretty much at the end of the <a href="https://github.com/GhostPack/Rubeus#sidenote-running-rubeus-through-powershell" target="_blank">Rubeus wiki</a>.</p>
+
+<pre><code>$RubeusAssembly = [System.Reflection.Assembly]::Load([Convert]::FromBase64String(&quot;aa...&quot;))
+</code></pre>
+
+<p>The command above uses the <code>System.Reflection</code> namespace to load a compiled C# console application into your active Powershell session. You can then execute the methods within directly from Powershell. Pretty cool I&rsquo;d say but how does it work?</p>
+
 <h2 id="a-quick-peak-into-reflection">A quick peak into reflection</h2>
+
 <p>First of all: I am not a software developer and I never learned software engineering. So if you find any conceptual mistakes or other nonsense in this post, please let me know so I can learn :)
 That said, let&rsquo;s take a quick look at the concept of &ldquo;reflection&rdquo; in the .NET framework.</p>
+
 <p>Reflection allows you to programmatically obtain information about .NET assemblies (.exe and .dll files written in .NET). In other words: you can write a .NET application that dynamically interacts with other, already compiled, .NET applications on your system. But the classes in the <code>Reflection.Assembly</code> namespace not only allow to query classes, methods and attributes from assemblies but also to instantiate new objects from these classes (=run them).</p>
-<p>To get started, you need the <code>[System.Reflection.Assembly]::Load</code>-class. If you have a look at the <a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.load?view=netframework-4.8">docs</a>, you&rsquo;ll see that we can load an assembly by handing a base64 encoded blob of the assembly to the <code>Load</code>-function.</p>
-<p><img src="https://cyberstoph.org/img/5_assemblyload.png" alt="assemblyload"></p>
+
+<p>To get started, you need the <code>[System.Reflection.Assembly]::Load</code>-class. If you have a look at the <a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.load?view=netframework-4.8" target="_blank">docs</a>, you&rsquo;ll see that we can load an assembly by handing a base64 encoded blob of the assembly to the <code>Load</code>-function.</p>
+
+<p><img src="https://cyberstoph.org/img/5_assemblyload.png" alt="assemblyload" /></p>
+
 <p>That&rsquo;s espescially useful since converting stuff into base64 means we can embed it into a PS script</p>
+
 <p><code>$file = [Convert]::ToBase64String([IO.File]::ReadAllBytes(&quot;.\Rubeus.exe&quot;))</code></p>
-<p>Next, we create an object of type <a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly?view=netframework-4.8">assembly</a></p>
+
+<p>Next, we create an object of type <a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly?view=netframework-4.8" target="_blank">assembly</a></p>
+
 <p><code>$Assembly = [System.Reflection.Assembly]::Load([Convert]::FromBase64String($file))</code></p>
+
 <p>Now we are able to enumerate the available types. The screenshot below is an excerpt of Rubeus.</p>
+
 <p><code>$Assembly.GetTypes()</code></p>
-<p><img src="https://cyberstoph.org/img/5_availabletypes.png" alt="availabletypes"></p>
+
+<p><img src="https://cyberstoph.org/img/5_availabletypes.png" alt="availabletypes" /></p>
+
 <p>Also of interest to our specific usecase is the entrypoint.</p>
+
 <p><code>$Assembly.EntryPoint | select Name,ReflectedType,Module</code></p>
-<p><img src="https://cyberstoph.org/img/5_entrypoint.png" alt="entrypoint"></p>
+
+<p><img src="https://cyberstoph.org/img/5_entrypoint.png" alt="entrypoint" /></p>
+
 <p>The image above tells us that the operating system would start execution of <code>Rubeus.exe</code> in the function <code>Main</code> of the namespace/class <code>Rubeus.Program</code>. If we want to run Rubeus manually, that&rsquo;s the information we need.</p>
+
 <h2 id="convertto-powershell">ConvertTo-Powershell</h2>
+
 <p>With the knowledge about the entrypoint, we&rsquo;ve got all we need to automatically create a .ps1 wrapper for a given .NET assembly.</p>
+
 <p><strong>Step 1 - Load the assembly and get the entrypoint</strong></p>
-<pre tabindex="0"><code>function Get-EntryPoint
+
+<pre><code>function Get-EntryPoint
 {
     [CmdletBinding()]
     Param (
@@ -166,18 +202,31 @@ That said, let&rsquo;s take a quick look at the concept of &ldquo;reflection&rdq
     $Assembly = [System.Reflection.Assembly]::Load([Convert]::FromBase64String($file))
     $Assembly.EntryPoint
 }
-</code></pre><p><strong>Step 2 - Build the command that will execute the entrypoint in the wrapper script</strong></p>
-<pre tabindex="0"><code>$ep = Get-EntryPoint -Path C:\path\yourfile.exe
+</code></pre>
+
+<p><strong>Step 2 - Build the command that will execute the entrypoint in the wrapper script</strong></p>
+
+<pre><code>$ep = Get-EntryPoint -Path C:\path\yourfile.exe
 $ldrcommand = &quot;[&quot; + $ep.reflectedtype.namespace + &quot;.&quot; + $ep.reflectedtype.name + &quot;]::&quot; + $ep.name + '($Command.Split(&quot; &quot;))'
-</code></pre><p>Note that we&rsquo;ll also pass commandline parameters to <code>$ep.name</code> through the use of the <code>$Command</code> parameter. The later will be available in the wrapper script.</p>
+</code></pre>
+
+<p>Note that we&rsquo;ll also pass commandline parameters to <code>$ep.name</code> through the use of the <code>$Command</code> parameter. The later will be available in the wrapper script.</p>
+
 <p><strong>Step 3 - combine</strong></p>
+
 <p>Finally, we&rsquo;ll put these two things together in addition to some standard PSArmoury routines for encryption/decryption and AV bypass as needed. The result will be a .ps1 file, which contains the base64-encoded (and encrypted) assembly as well as the information on how to invoke it directly from PowerShell as described above. Have a look at the last two lines in the screenshot below.</p>
-<p><img src="https://cyberstoph.org/img/5_finalexample1.png" alt="finalexample1"></p>
+
+<p><img src="https://cyberstoph.org/img/5_finalexample1.png" alt="finalexample1" /></p>
+
 <p>And that&rsquo;s it. Feel free to try and let me know what I missed (pretty sure I missed something ;-) ). Here&rsquo;s an example for how to use it.</p>
-<p><img src="https://cyberstoph.org/img/5_finalexample2.png" alt="finalexample1"></p>
+
+<p><img src="https://cyberstoph.org/img/5_finalexample2.png" alt="finalexample1" /></p>
+
 <p>One last note: if you get an error message like the one below when running ConvertTo-Powershell, then that&rsquo;s probably AMSI complaining about the file you want to convert. In my example, thats Rubeus.exe.</p>
-<p><img src="https://cyberstoph.org/img/5_finalexample3.png" alt="finalexample1"></p>
-<p>So don&rsquo;t forget to disable or bypass AMSI on the machine you use to convert. The AMSI bypass that comes with ConvertTo-Powershell is only executed in the .ps1 files you create but not in the builder function. You can find a standalone version of that one <a href="https://github.com/cfalta/PoshRandom/blob/master/Disable-AMSI.ps1">over here</a></p>
+
+<p><img src="https://cyberstoph.org/img/5_finalexample3.png" alt="finalexample1" /></p>
+
+<p>So don&rsquo;t forget to disable or bypass AMSI on the machine you use to convert. The AMSI bypass that comes with ConvertTo-Powershell is only executed in the .ps1 files you create but not in the builder function. You can find a standalone version of that one <a href="https://github.com/cfalta/PoshRandom/blob/master/Disable-AMSI.ps1" target="_blank">over here</a></p>
 
             </div>
         </article>
@@ -196,7 +245,7 @@ $ldrcommand = &quot;[&quot; + $ep.reflectedtype.namespace + &quot;.&quot; + $ep.
                 <footer class="footer">
     <div class="footer__inner">
         <div class="footer__content">
-            <span>&copy; 2021</span>
+            <span>&copy; 2022</span>
             
                 <span><a href="https://cyberstoph.org/">Christoph Falta</a></span>
             
@@ -225,7 +274,7 @@ $ldrcommand = &quot;[&quot; + $ep.reflectedtype.namespace + &quot;.&quot; + $ep.
 
 
 
-<script type="text/javascript" src="https://cyberstoph.org/bundle.min.766584e6ea536f54faf86b018d73f719fc520199a6c4d32cbd959eb87634c11b380ac646d80d67304313aac0f5f05e6715221bd99a619bbc905365b55f78147f.js" integrity="sha512-dmWE5upTb1T6&#43;GsBjXP3GfxSAZmmxNMsvZWeuHY0wRs4CsZG2A1nMEMTqsD18F5nFSIb2Zphm7yQU2W1X3gUfw=="></script>
+<script type="text/javascript" src="https://cyberstoph.org/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
 
 
 

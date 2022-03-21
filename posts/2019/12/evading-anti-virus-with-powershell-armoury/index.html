@@ -38,10 +38,17 @@ PSArmoury I wrote my &amp;ldquo;Powershell Armoury&amp;rdquo; script a while ago
 <link rel="mask-icon" href="https://cyberstoph.org/safari-pinned-tab.svg" color="#252627">
 <link rel="shortcut icon" href="https://cyberstoph.org/favicon.ico">
 <meta name="theme-color" content="#252627"><meta itemprop="name" content="Evading anti-virus with Powershell Armoury">
-<meta itemprop="description" content="This post introduces a Powershell script for pentesters that allows easy generation of encrypted powershell toolsets"><meta itemprop="datePublished" content="2019-12-02T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2019-12-02T00:00:00+00:00" />
-<meta itemprop="wordCount" content="648"><meta itemprop="image" content="https://cyberstoph.org/"/>
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary_large_image"/>
+<meta itemprop="description" content="This post introduces a Powershell script for pentesters that allows easy generation of encrypted powershell toolsets">
+
+
+<meta itemprop="datePublished" content="2019-12-02T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2019-12-02T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="648">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://cyberstoph.org/"/>
 
 <meta name="twitter:title" content="Evading anti-virus with Powershell Armoury"/>
@@ -124,40 +131,65 @@ PSArmoury I wrote my &amp;ldquo;Powershell Armoury&amp;rdquo; script a while ago
             
 
             <div class="post-content">
-                <h2 id="tldr">TL;DR;</h2>
-<p><a href="https://github.com/cfalta/PowerShellArmoury">PSArmoury</a> is a PowerShell script that allows you to easily get the newest versions of all your favourite offensive PowerShell craft and automatically put it together in a single, encrypted .ps1-file. Think of it like a &ldquo;yum update&rdquo; that pipes the result in an encrypted container to take it with you. AMSI and EDR bypass included :-)</p>
+                
+
+<h2 id="tl-dr">TL;DR;</h2>
+
+<p><a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">PSArmoury</a> is a PowerShell script that allows you to easily get the newest versions of all your favourite offensive PowerShell craft and automatically put it together in a single, encrypted .ps1-file. Think of it like a &ldquo;yum update&rdquo; that pipes the result in an encrypted container to take it with you. AMSI and EDR bypass included :-)</p>
+
 <h2 id="psarmoury">PSArmoury</h2>
+
 <p>I wrote my &ldquo;Powershell Armoury&rdquo; script a while ago to tackle two issues I often encountered during engagements:</p>
+
 <ul>
 <li>First, I&rsquo;m a huge fan of PowerShell and if possible, I do everything in PowerShell. So after some time I got a pretty big list of already existing tools and self-made scripts that I want to take with me when doing a Windows or Active Directory assessment. However all these different scripts (even my own ;-)) get updated frequently and I usually ended up with some out-dated software in the field.</li>
 <li>Second, most of the existing well-known PowerShell tools like PowerView or Inveigh will be detected instantly by any anti-virus solution - at least on disk.</li>
 </ul>
-<p><img src="https://cyberstoph.org/img/braveheart.png" alt="braveheart"></p>
+
+<p><img src="https://cyberstoph.org/img/braveheart.png" alt="braveheart" /></p>
+
 <p>So I created PSArmoury, which allows me to do the following:</p>
+
 <ul>
 <li>Create a simple json config file containing links to all my favourite tools on the internet. You only have to do this once.</li>
 <li>Then, everytime before an engagement you just run New-PSArmoury and it will automatically fetch the newest version of all those PowerShell scripts and put them together in a single, encrypted ps1-file. This is your Armoury.</li>
 </ul>
-<p>Let&rsquo;s have a look at that. You can find PSArmoury on <a href="https://github.com/cfalta/PowerShellArmoury">Github</a>. Just download or clone and you&rsquo;re ready to go.
+
+<p>Let&rsquo;s have a look at that. You can find PSArmoury on <a href="https://github.com/cfalta/PowerShellArmoury" target="_blank">Github</a>. Just download or clone and you&rsquo;re ready to go.
 First, let&rsquo;s have a look at the config. PSArmoury comes with a sample configuration file called PSArmoury.json that already references some well-known tools like PowerSploit or Inveigh. You can use this for inspiration. The configuration file is just a JSON array containing the different script files you want to include. An array member looks like this.</p>
-<p><img src="https://cyberstoph.org/img/psarmoury1.PNG" alt="psarmoury1"></p>
+
+<p><img src="https://cyberstoph.org/img/psarmoury1.PNG" alt="psarmoury1" /></p>
+
 <p>Every config item consists of a name, an URL, a type and optional inclusion/exclusion filter. The major difference here is the type and there are three differen types available.</p>
+
 <ul>
 <li><strong>GitHubRepo</strong>: this instructs PSArmoury to automatically include all files in the Github Repo (that matches the Inclusion/Exclusion filter). It will ask for a Github username and personal access token since we use the Github API here.</li>
 <li><strong>GitHubItem</strong>: this instructs PSArmoury to download a single file from Github. It will ask for a Github username and personal access token since we use the Github API here.</li>
 <li><strong>WebDownloadSimple</strong>: this instructs PSArmoury to download a single file from an arbitrary webserver. No credentials needed.</li>
 </ul>
+
 <p>So in the example above, the configuration instructs PSArmoury to download all files from Kevin Robertsons repostory &ldquo;Invoke-TheHash&rdquo; that match the inclusion filter &ldquo;*.ps1&rdquo;.</p>
+
 <p>Once you have created your configuration, you can simply run</p>
-<pre tabindex="0"><code>. .\New-PSArmoury.ps1
+
+<pre><code>. .\New-PSArmoury.ps1
 New-PSArmoury -Path .\MyShinyNewArmoury.ps1 -Config .\PSArmoury.json
-</code></pre><p>Note that it will require you to enter credentials to use the GitHub API. You have to enter your username and a personal access token.</p>
+</code></pre>
+
+<p>Note that it will require you to enter credentials to use the GitHub API. You have to enter your username and a personal access token.</p>
+
 <p>Here&rsquo;s a screenshot using the sample config that comes with PSArmoury.</p>
-<p><img src="https://cyberstoph.org/img/psarmoury2.PNG" alt="psarmoury1"></p>
+
+<p><img src="https://cyberstoph.org/img/psarmoury2.PNG" alt="psarmoury1" /></p>
+
 <p>The output above mentions a password. This has been generated randomly and is included <strong>in cleartext</strong> in the resulting armoury file. This is not a problem since we use encryption only as a means of obfuscation here and not for confidentiality. Still, if you want to remove the password from your armoury you can use the <code>-OmitPassword</code> switch to do so. If you want to use a custom password or salt you can do this too by using the <code>-Password</code> and <code>-Salt</code> parameters.</p>
+
 <p>Now, how do you use your new and shiny armoury? It&rsquo;s actually very simple, just open powershell on the host of your choice and load the .ps1 file like this.</p>
-<pre tabindex="0"><code>cat -raw .\MyShinyNewArmoury.ps1 | iex
-</code></pre><p>And that&rsquo;s it. This will disable AMSI, load all encrypted blobs into powershell and then decrypt and load them in memory. Happy Hacking :-)</p>
+
+<pre><code>cat -raw .\MyShinyNewArmoury.ps1 | iex
+</code></pre>
+
+<p>And that&rsquo;s it. This will disable AMSI, load all encrypted blobs into powershell and then decrypt and load them in memory. Happy Hacking :-)</p>
 
             </div>
         </article>
@@ -176,7 +208,7 @@ New-PSArmoury -Path .\MyShinyNewArmoury.ps1 -Config .\PSArmoury.json
                 <footer class="footer">
     <div class="footer__inner">
         <div class="footer__content">
-            <span>&copy; 2021</span>
+            <span>&copy; 2022</span>
             
                 <span><a href="https://cyberstoph.org/">Christoph Falta</a></span>
             
@@ -205,7 +237,7 @@ New-PSArmoury -Path .\MyShinyNewArmoury.ps1 -Config .\PSArmoury.json
 
 
 
-<script type="text/javascript" src="https://cyberstoph.org/bundle.min.766584e6ea536f54faf86b018d73f719fc520199a6c4d32cbd959eb87634c11b380ac646d80d67304313aac0f5f05e6715221bd99a619bbc905365b55f78147f.js" integrity="sha512-dmWE5upTb1T6&#43;GsBjXP3GfxSAZmmxNMsvZWeuHY0wRs4CsZG2A1nMEMTqsD18F5nFSIb2Zphm7yQU2W1X3gUfw=="></script>
+<script type="text/javascript" src="https://cyberstoph.org/bundle.min.4c3fb12a087ceed4a52cb5d57068a9795c7069617a01ca70f788052ad66e1791779e6c72686e1dc0ca13dc03b0203204b6566bb0dd1ee80de2b7ff4d8fe53db2.js" integrity="sha512-TD&#43;xKgh87tSlLLXVcGipeVxwaWF6Acpw94gFKtZuF5F3nmxyaG4dwMoT3AOwIDIEtlZrsN0e6A3it/9Nj&#43;U9sg=="></script>
 
 
 

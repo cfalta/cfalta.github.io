@@ -6,20 +6,42 @@
     <description>Recent content in Categories on Cyberstoph&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Fri, 24 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cyberstoph.org/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 21 Mar 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://cyberstoph.org/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
       <title>ActiveDirectory</title>
       <link>https://cyberstoph.org/categories/activedirectory/</link>
-      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
       
       <guid>https://cyberstoph.org/categories/activedirectory/</guid>
       <description></description>
     </item>
     
     <item>
+      <title>Azure</title>
+      <link>https://cyberstoph.org/categories/azure/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/azure/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>AzureAD</title>
+      <link>https://cyberstoph.org/categories/azuread/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/azuread/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>BlueTeam</title>
       <link>https://cyberstoph.org/categories/blueteam/</link>
-      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
       
       <guid>https://cyberstoph.org/categories/blueteam/</guid>
       <description></description>
@@ -28,9 +50,45 @@
     <item>
       <title>Kerberos</title>
       <link>https://cyberstoph.org/categories/kerberos/</link>
-      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
       
       <guid>https://cyberstoph.org/categories/kerberos/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>msDS-KeyCredentialLink</title>
+      <link>https://cyberstoph.org/categories/msds-keycredentiallink/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/msds-keycredentiallink/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Security</title>
+      <link>https://cyberstoph.org/categories/security/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/security/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SOC</title>
+      <link>https://cyberstoph.org/categories/soc/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/soc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>WHFB</title>
+      <link>https://cyberstoph.org/categories/whfb/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://cyberstoph.org/categories/whfb/</guid>
       <description></description>
     </item>
     
@@ -40,60 +98,6 @@
       <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://cyberstoph.org/categories/ntlm/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>PetitPotam</title>
-      <link>https://cyberstoph.org/categories/petitpotam/</link>
-      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/petitpotam/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>SpoolSample</title>
-      <link>https://cyberstoph.org/categories/spoolsample/</link>
-      <pubDate>Fri, 24 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/spoolsample/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>LocalPrivilegeEscalation</title>
-      <link>https://cyberstoph.org/categories/localprivilegeescalation/</link>
-      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/localprivilegeescalation/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>OffensivePowerShell</title>
-      <link>https://cyberstoph.org/categories/offensivepowershell/</link>
-      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/offensivepowershell/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Pentest</title>
-      <link>https://cyberstoph.org/categories/pentest/</link>
-      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/pentest/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>RedTeaming</title>
-      <link>https://cyberstoph.org/categories/redteaming/</link>
-      <pubDate>Sat, 26 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://cyberstoph.org/categories/redteaming/</guid>
       <description></description>
     </item>
     
